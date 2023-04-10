@@ -1,0 +1,51 @@
+package setting
+
+import "time"
+
+type ServerSettingS struct {
+	RunMode      string
+	HttpPort     string
+	ReadTimeout  time.Duration
+	WriteTimeout time.Duration
+}
+
+type GeneralSettingS struct {
+	LogSavePath string
+	LogFileName string
+	LogFileExt  string
+	LogMaxSize  int
+	LogMaxAge   int
+	MaxThreads  int
+	MaxTasks    int
+}
+
+type DatabaseSettingS struct {
+	DBConn       string
+	DBType       string
+	MaxIdleConns int
+	MaxOpenConns int
+	MaxLifetime  int
+}
+
+type ObjectSettingS struct {
+	OBJECT_ResId               string
+	OBJECT_AK                  string
+	OBJECT_POST_Upload         string
+	OBJECT_GET_Download        string
+	UPLOAD_ROOT                string
+	OBJECT_Upload_Success_Code int
+	OBJECT_Count               int
+	OBJECT_Store_Type          int
+	OBJECT_Interface_Type      int
+	OBJECT_Temp_GET_Down       string
+	OBJECT_Temp_GET_Upload     string
+	File_Fragment_Size         int
+}
+
+func (s *Setting) ReadSection(k string, v interface{}) error {
+	err := s.vp.UnmarshalKey(k, v)
+	if err != nil {
+		return err
+	}
+	return nil
+}
