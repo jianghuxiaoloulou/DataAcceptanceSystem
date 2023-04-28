@@ -10,13 +10,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @title 存储策略下载服务
-// @version 1.0.0.1
-// @description 存储策略下载服务
-// @termsOfService https://github.com/jianghuxiaoloulou/ObjectCloudService_Down.git
+// @title PACS集成平台
+// @version 1.0.0.0
+// @description PACS集成平台
+// @termsOfService https://github.com/jianghuxiaoloulou/DataAcceptanceSystem.git
 func main() {
-	global.Logger.Info("***开始运行存储策略下载服务***")
-	global.ObjectDataChan = make(chan global.ObjectData)
+	global.Logger.Info("***开始运行PACS集成平台服务***")
+	global.ApplyFormStatusDataChan = make(chan global.ApplyFormStatusData, global.GeneralSetting.MaxThreads)
 	// 注册工作池，传入任务
 	// 参数1 初始化worker(工人)设置最大线程数
 	wokerPool := workpattern.NewWorkerPool(global.GeneralSetting.MaxThreads)
@@ -26,7 +26,7 @@ func main() {
 	go func() {
 		for {
 			select {
-			case data := <-global.ObjectDataChan:
+			case data := <-global.ApplyFormStatusDataChan:
 				sc := &Dosomething{key: data}
 				wokerPool.JobQueue <- sc
 			}
@@ -37,20 +37,18 @@ func main() {
 }
 
 type Dosomething struct {
-	key global.ObjectData
+	key global.ApplyFormStatusData
 }
 
 func (d *Dosomething) Do() {
 	global.Logger.Info("正在处理的数据是：", d.key)
 	//处理封装对象
-	obj := object.NewObject(d.key)
-	switch d.key.ActionType {
-	case global.UPLOAD:
-		// 数据上传
-		obj.UploadObject()
-	case global.DOWNLOAD:
-		// 数据下载
-		obj.DownObject()
+	switch d.key.Bizno {
+	case global.Server_ApplyStatus:
+		// 申请单状态处理
+		object.ApplyFormStatusNotity(d.key)
+	case global.Server_ApplyInfo:
+		// obj.DownObject()
 	}
 }
 
@@ -66,16 +64,4 @@ func web() {
 		MaxHeaderBytes: 1 << 20,
 	}
 	ser.ListenAndServe()
-}
-
-func TestData() {
-	data := global.ObjectData{
-		InstanceKey: 1,
-		FileKey:     "Windows 7 x86-s001.vmdk",
-		FilePath:    "D:\\work\\ZSH\\Windows 7 x86-s001_test.vmdk",
-		ActionType:  global.DOWNLOAD,
-		FileType:    global.JPG,
-		Count:       1,
-	}
-	global.ObjectDataChan <- data
 }

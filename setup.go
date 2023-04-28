@@ -71,6 +71,15 @@ func setupWriteDBEngine() error {
 	return nil
 }
 
+func setupOracleDBEngine() error {
+	var err error
+	global.OracleDBEngine, err = model.NewOracleDBEngine(global.DatabaseSetting)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func readSetup() {
 	err := setupSetting()
 	if err != nil {
@@ -87,5 +96,9 @@ func readSetup() {
 	err = setupWriteDBEngine()
 	if err != nil {
 		log.Fatalf("init.setupWriteDBEngine err: %v", err)
+	}
+	err = setupOracleDBEngine()
+	if err != nil {
+		log.Fatalf("init.setupOracleDBEngine err: %v", err)
 	}
 }

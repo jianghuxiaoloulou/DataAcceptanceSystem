@@ -2,104 +2,108 @@ package v1
 
 import (
 	"WowjoyProject/DataAcceptanceSystem/global"
-	"WowjoyProject/DataAcceptanceSystem/internal/model"
-	"WowjoyProject/DataAcceptanceSystem/pkg/app"
-	"WowjoyProject/DataAcceptanceSystem/pkg/errcode"
+	"WowjoyProject/DataAcceptanceSystem/pkg/object"
+	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-// 通过检查号上传
-func ByAccessNunUpload(c *gin.Context) {
+// 服务测试通讯
+func GetServerTime(c *gin.Context) {
 	reqIP := c.ClientIP()
-	id := c.Param("AccessNumber")
-	global.Logger.Info("请求的IP: ", reqIP, "需要上传的检查号是：", id)
-	if id != "" {
-		// 成功：
-		app.NewResponse(c).ToResponse(nil)
-		// 获取上传任务：
-		model.GetRequestData(id, global.AccessNumber, global.UPLOAD)
-	} else {
-		// 失败：
-		app.NewResponse(c).ToErrorResponse(errcode.ServerError)
+	global.Logger.Debug("请求的主机IP: ", reqIP)
+	var testserver global.TestServer
+	var result global.TestServerResult
+	err := c.ShouldBind(&testserver)
+	if err != nil {
+		global.Logger.Error(reqIP, " bind error", testserver)
+		ack_info := global.AckInfo{
+			Code: 1,
+			Msg:  err.Error(),
+		}
+		result.Bizno = testserver.Bizno
+		result.Time = time.Now().Format("20060102150405")
+		result.Info = ack_info
+		c.JSON(http.StatusBadRequest, result)
+		return
 	}
+	global.Logger.Debug(reqIP, " Server Test Data: ", testserver)
+	// 返回结果
+	ack_info := global.AckInfo{
+		Code: 0,
+		Msg:  "successful",
+	}
+	result.Bizno = testserver.Bizno
+	result.Time = time.Now().Format("20060102150405")
+	result.Info = ack_info
+	c.JSON(http.StatusOK, result)
 }
 
-// 通过UidEnc上传
-func ByUidEncUpload(c *gin.Context) {
+// 申请单状态
+func ApplyFormStatus(c *gin.Context) {
 	reqIP := c.ClientIP()
-
-	id := c.Param("UidEnc")
-	global.Logger.Info("请求的IP: ", reqIP, "需要下载的UidEnc是：", id)
-	if id != "" {
-		// 成功：
-		app.NewResponse(c).ToResponse(nil)
-		// 获取下载任务：
-		model.GetRequestData(id, global.UidEnc, global.UPLOAD)
-	} else {
-		// 失败：
-		app.NewResponse(c).ToErrorResponse(errcode.ServerError)
+	global.Logger.Debug("请求的主机IP: ", reqIP)
+	var applyformstatus global.ApplyFormStatusData
+	var result global.ApplyFormStatusResult
+	err := c.ShouldBind(&applyformstatus)
+	if err != nil {
+		global.Logger.Error(reqIP, " bind error", applyformstatus)
+		ack_info := global.AckInfo{
+			Code: 1,
+			Msg:  err.Error(),
+		}
+		result.Bizno = applyformstatus.Bizno
+		result.Time = time.Now().Format("20060102150405")
+		result.Info = ack_info
+		c.JSON(http.StatusBadRequest, result)
+		return
 	}
+	global.Logger.Debug(reqIP, " Server Test Data: ", applyformstatus)
+	// 处理数据
+	global.ApplyFormStatusDataChan <- applyformstatus
+	// 返回结果
+	ack_info := global.AckInfo{
+		Code: 0,
+		Msg:  "successful",
+	}
+	result.Bizno = applyformstatus.Bizno
+	result.Time = time.Now().Format("20060102150405")
+	result.Info = ack_info
+	c.JSON(http.StatusOK, result)
 }
 
-// 通过InstanceKey上传数据
-func ByInstanceKeyUpload(c *gin.Context) {
-	id := c.Param("InstanceKey")
-	global.Logger.Info("需要下载的InstanceKey是：", id)
-	if id != "" {
-		// 成功：
-		app.NewResponse(c).ToResponse(nil)
-		// 获取下载任务：
-		model.GetRequestData(id, global.InstanceKey, global.UPLOAD)
-	} else {
-		// 失败：
-		app.NewResponse(c).ToErrorResponse(errcode.ServerError)
-	}
-}
-
-// 通过检查号下载
-func ByAccessNumDownData(c *gin.Context) {
+// 获取申请单信息
+func ApplyFormInfo(c *gin.Context) {
 	reqIP := c.ClientIP()
-	id := c.Param("AccessNumber")
-	global.Logger.Info("请求的IP: ", reqIP, " 需要下载的检查号是：", id)
-	if id != "" {
-		// 成功：
-		app.NewResponse(c).ToResponse(nil)
-		// 获取下载任务：
-		model.GetRequestData(id, global.AccessNumber, global.DOWNLOAD)
-	} else {
-		// 失败：
-		app.NewResponse(c).ToErrorResponse(errcode.ServerError)
+	global.Logger.Debug("请求的主机IP: ", reqIP)
+	var applyforminfo global.ApplyFormInfoData
+	var result global.ApplyFormInfoResult
+	err := c.ShouldBind(&applyforminfo)
+	if err != nil {
+		global.Logger.Error(reqIP, " bind error", applyforminfo)
+		ack_info := global.AckInfo{
+			Code: 1,
+			Msg:  err.Error(),
+		}
+		result.Bizno = applyforminfo.Bizno
+		result.Time = time.Now().Format("20060102150405")
+		result.PARAM = ack_info
+		c.JSON(http.StatusBadRequest, result)
+		return
 	}
-}
+	// 获取患者申请单数据信息
+	var data []global.ApplyFormResultData
+	data = object.GetApplyFormData(applyforminfo)
 
-// 通过UidEnc下载数据
-func ByUidEncDownData(c *gin.Context) {
-	reqIP := c.ClientIP()
-	id := c.Param("UidEnc")
-	global.Logger.Info("请求的IP: ", reqIP, " 需要下载的UidEnc是：", id)
-	if id != "" {
-		// 成功：
-		app.NewResponse(c).ToResponse(nil)
-		// 获取下载任务：
-		model.GetRequestData(id, global.UidEnc, global.DOWNLOAD)
-	} else {
-		// 失败：
-		app.NewResponse(c).ToErrorResponse(errcode.ServerError)
+	// 返回结果
+	ack_info := global.AckInfo{
+		Code: 0,
+		Msg:  "successful",
 	}
-}
-
-// 通过InstanceKey下载数据
-func ByInstanceKeyDownData(c *gin.Context) {
-	id := c.Param("InstanceKey")
-	global.Logger.Info("需要下载的InstanceKey是：", id)
-	if id != "" {
-		// 成功：
-		app.NewResponse(c).ToResponse(nil)
-		// 获取下载任务：
-		model.GetRequestData(id, global.InstanceKey, global.DOWNLOAD)
-	} else {
-		// 失败：
-		app.NewResponse(c).ToErrorResponse(errcode.ServerError)
-	}
+	result.Bizno = applyforminfo.Bizno
+	result.Time = time.Now().Format("20060102150405")
+	result.PARAM = ack_info
+	result.DATA = data
+	c.JSON(http.StatusOK, result)
 }

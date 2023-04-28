@@ -25,21 +25,13 @@ type DatabaseSettingS struct {
 	MaxIdleConns int
 	MaxOpenConns int
 	MaxLifetime  int
+	OracleDBType string
+	OracleDBConn string
+	OracleDBView string
 }
 
 type ObjectSettingS struct {
-	OBJECT_ResId               string
-	OBJECT_AK                  string
-	OBJECT_POST_Upload         string
-	OBJECT_GET_Download        string
-	UPLOAD_ROOT                string
-	OBJECT_Upload_Success_Code int
-	OBJECT_Count               int
-	OBJECT_Store_Type          int
-	OBJECT_Interface_Type      int
-	OBJECT_Temp_GET_Down       string
-	OBJECT_Temp_GET_Upload     string
-	File_Fragment_Size         int
+	HISURL string
 }
 
 func (s *Setting) ReadSection(k string, v interface{}) error {

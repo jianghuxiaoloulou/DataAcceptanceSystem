@@ -1,58 +1,23 @@
 package global
 
-// 数据请求类型
-type RequestType int
-
+// 服务编码
 const (
-	AccessNumber RequestType = iota // 检查单
-	UidEnc                          // 检查单ID
-	InstanceKey                     // Instance_key
+	Server_ApplyStatus string = "1000" // 申请单状态编码
+	Server_ApplyInfo   string = "2001" // 申请单信息编码
 )
 
-const (
-	Interface_Type_Platform int = iota // 通过平台转发的下载模式
-	Interfacce_Type_S3                 // 通过S3下载模式
-)
-
-// 数据处理模式
-type ActionMode int
-
-const (
-	UPLOAD   ActionMode = iota // 上传
-	DOWNLOAD                   // 下载
-	DELETE                     // 删除
-)
-
-// 文件模式
-type FileModel int
-
-const (
-	DCM FileModel = iota // DCM 文件
-	JPG                  // JPG 文件
-)
-
-// 文件状态
-type FileStatus int
-
-const (
-	FileNotExist FileStatus = iota // 文件不存在
-	FileExist                      // 文件存在
-	FileFailed                     // 文件失败
-)
-const (
-	PublicCloud  int = iota // 共有云
-	PrivateCloud            // 私有云
-)
-
-type ObjectData struct {
-	InstanceKey int64
-	FileKey     string     // 文件key
-	FilePath    string     // 文件路径
-	ActionType  ActionMode // 操作类型
-	FileType    FileModel  // 文件类型
-	Count       int        // 执行次数
+// 测试服务通信
+type TestServer struct {
+	Bizno string `json:"bizno" binding:"required"` // 服务编码值
+	Time  string `json:"time" binding:"required"`  // 请求时间
 }
 
-var (
-	ObjectDataChan chan ObjectData
-)
+type TestServerResult struct {
+	Bizno string  `json:"bizno"` // 服务编码值
+	Time  string  `json:"time"`  // 服务响应时间
+	Info  AckInfo `json:"ack_info"`
+}
+type AckInfo struct {
+	Code int    `json:"code"` // 接口响应CODE
+	Msg  string `json:"msg"`  // 接口响应消息
+}

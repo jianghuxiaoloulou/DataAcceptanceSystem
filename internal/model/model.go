@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"time"
 
+	_ "github.com/godror/godror"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
@@ -16,6 +17,19 @@ type KeyData struct {
 
 func NewDBEngine(databaseSetting *setting.DatabaseSettingS) (*sql.DB, error) {
 	db, err := sql.Open(databaseSetting.DBType, databaseSetting.DBConn)
+	if err != nil {
+		return nil, err
+	}
+	// 数据库最大连接数
+	db.SetConnMaxLifetime(time.Duration(databaseSetting.MaxLifetime) * time.Minute)
+	db.SetMaxOpenConns(databaseSetting.MaxOpenConns)
+	db.SetMaxIdleConns(databaseSetting.MaxIdleConns)
+
+	return db, nil
+}
+
+func NewOracleDBEngine(databaseSetting *setting.DatabaseSettingS) (*sql.DB, error) {
+	db, err := sql.Open(databaseSetting.OracleDBType, databaseSetting.OracleDBConn)
 	if err != nil {
 		return nil, err
 	}
