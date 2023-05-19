@@ -1,5 +1,6 @@
 package global
 
+// 报告数据全局变量
 // 报告数据
 type ReportKeyData struct {
 	ReportId       string `db:"report_id"`        // 报告ID

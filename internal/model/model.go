@@ -9,11 +9,11 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-type KeyData struct {
-	instance_key                                                                         sql.NullInt64
-	dcmfile, imgfile, dcmremotekey, jpgremotekey, ip, virpath                            sql.NullString
-	jpgstatus, dcmstatus, jpglocalstatus, dcmlocalstatus, jpgcloudstatus, dcmcloudstatus sql.NullInt16
-}
+// type KeyData struct {
+// 	instance_key                                                                         sql.NullInt64
+// 	dcmfile, imgfile, dcmremotekey, jpgremotekey, ip, virpath                            sql.NullString
+// 	jpgstatus, dcmstatus, jpglocalstatus, dcmlocalstatus, jpgcloudstatus, dcmcloudstatus sql.NullInt16
+// }
 
 func NewDBEngine(databaseSetting *setting.DatabaseSettingS) (*sql.DB, error) {
 	db, err := sql.Open(databaseSetting.DBType, databaseSetting.DBConn)

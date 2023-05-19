@@ -31,7 +31,8 @@ type DatabaseSettingS struct {
 }
 
 type ObjectSettingS struct {
-	HISURL string
+	InterfaceSystemType int
+	HISURL              string
 }
 
 func (s *Setting) ReadSection(k string, v interface{}) error {

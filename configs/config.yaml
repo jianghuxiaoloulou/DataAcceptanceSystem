@@ -26,5 +26,8 @@ Database:
   OracleDBConn: user="pacs_hz" password="yZLoGA0v" connectString="192.168.10.2:1521/orcl"
   OracleDBView: V_PACS_HZ
 Object:
+  # 第三方系统类型: 根据医院编号字典表对应（1.树兰医院，2.酉阳医院）
+   InterfaceSystemType: 1
+  
   # 中联HIS接口
   HISURL: http://192.168.10.167:8099/zlhis-recv/pacs

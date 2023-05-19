@@ -59,7 +59,7 @@ func ApplyFormStatus(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, result)
 		return
 	}
-	global.Logger.Debug(reqIP, " Server Test Data: ", applyformstatus)
+	global.Logger.Debug(reqIP, " Server Data: ", applyformstatus)
 	// 处理数据
 	global.ApplyFormStatusDataChan <- applyformstatus
 	// 返回结果

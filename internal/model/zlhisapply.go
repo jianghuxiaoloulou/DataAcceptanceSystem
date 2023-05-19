@@ -1,6 +1,12 @@
 package model
 
-import "database/sql"
+// 中联his 数据包
+
+import (
+	"WowjoyProject/DataAcceptanceSystem/global"
+	"database/sql"
+	"strconv"
+)
 
 type ZLHISApply struct {
 	Pat_Info   PatientInfo
@@ -65,4 +71,146 @@ type ApplyInfo struct {
 	Apply_section_id             sql.NullString // 病区名称ID：（住院特有）
 	Apply_section                sql.NullString // 病区名称：（住院特有）
 	Apply_sicked_index           sql.NullString // 床号：（住院特有）
+}
+
+// 获取申请单数据
+func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
+	global.Logger.Debug("开始查询视图数据.....")
+	var err error
+	err = global.OracleDBEngine.Ping()
+	if err != nil {
+		global.Logger.Error(err.Error())
+		global.OracleDBEngine, _ = NewOracleDBEngine(global.DatabaseSetting)
+	}
+	rows, err := global.OracleDBEngine.Query(sql)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		key := ZLHISApply{}
+		rows.Scan(&key.Apply_Info.Apply_id, &key.Pat_Info.Pat_name, &key.Apply_Info.Apply_pat_type_code, &key.Apply_Info.Apply_pat_type,
+			&key.Apply_Info.Apply_medical_record, &key.Pat_Info.Pat_sex_code, &key.Pat_Info.Pat_sex, &key.Pat_Info.Pat_age, &key.Pat_Info.Pat_age_unit,
+			&key.Pat_Info.Pat_brsdate, &key.Apply_Info.Apply_study_type, &key.Apply_Info.Apply_checkitems_id, &key.Apply_Info.Apply_checkitems_name,
+			&key.Apply_Info.Apply_bodyparts_id, &key.Apply_Info.Apply_bodyparts_name, &key.Apply_Info.Apply_clinic_id, &key.Apply_Info.Apply_clinic_id,
+			&key.Apply_Info.Apply_visit_card_no, &key.Pat_Info.Pat_tel, &key.Apply_Info.Apply_section_id, &key.Apply_Info.Apply_section, &key.Apply_Info.Apply_sicked_index,
+			&key.Apply_Info.Apply_time, &key.Apply_Info.Apply_details_id, &key.Pat_Info.Pat_idno, &key.Pat_Info.Pat_addr, &key.Apply_Info.Apply_clinical_diagnosis,
+			&key.Apply_Info.Apply_illness_history, &key.Apply_Info.Apply_department_id, &key.Apply_Info.Apply_department, &key.Apply_Info.Apply_doctor_id,
+			&key.Apply_Info.Apply_doctor, &key.Apply_Info.Apply_check_note, &key.Apply_Info.Apply_film_count, &key.Apply_Info.Apply_film_flag, &key.Apply_Info.Apply_report_flag,
+			&key.Apply_Info.Apply_mergency_status, &key.Apply_Info.Apply_fee)
+
+		var sex int
+		if key.Pat_Info.Pat_sex.String == "男" {
+			sex = 1
+		} else if key.Pat_Info.Pat_sex.String == "女" {
+			sex = 2
+		} else {
+			sex = 9
+		}
+
+		var ageUnit int
+		if key.Pat_Info.Pat_age_unit.String == "岁" {
+			ageUnit = 1
+		} else if key.Pat_Info.Pat_age_unit.String == "月" {
+			ageUnit = 2
+		} else if key.Pat_Info.Pat_age_unit.String == "周" {
+			ageUnit = 3
+		} else if key.Pat_Info.Pat_age_unit.String == "天" {
+			ageUnit = 4
+		} else if key.Pat_Info.Pat_age_unit.String == "时" {
+			ageUnit = 5
+		} else if key.Pat_Info.Pat_age_unit.String == "分" {
+			ageUnit = 6
+		} else if key.Pat_Info.Pat_age_unit.String == "秒" {
+			ageUnit = 7
+		}
+
+		patinfo := global.PatientInfo{
+			Pat_name:     key.Pat_Info.Pat_name.String,
+			Pat_sex_code: key.Pat_Info.Pat_sex_code.String,
+			Pat_sex:      sex,
+			Pat_age:      int(key.Pat_Info.Pat_age.Int16),
+			Pat_age_unit: ageUnit,
+			Pat_brsdate:  key.Pat_Info.Pat_brsdate.String[0:10],
+			Pat_tel:      key.Pat_Info.Pat_tel.String,
+			Pat_idno:     key.Pat_Info.Pat_idno.String,
+			Pat_addr:     key.Pat_Info.Pat_addr.String,
+		}
+
+		var pattype int
+		if key.Apply_Info.Apply_pat_type.String == "门诊" {
+			pattype = 1
+		} else if key.Apply_Info.Apply_pat_type.String == "住院" {
+			pattype = 2
+		} else if key.Apply_Info.Apply_pat_type.String == "体检" {
+			pattype = 3
+		} else {
+			pattype = 9
+		}
+
+		var studytype int
+		if key.Apply_Info.Apply_study_type.String == "CT" {
+			studytype = 3
+		} else if key.Apply_Info.Apply_study_type.String == "DR" {
+			studytype = 2
+		} else if key.Apply_Info.Apply_study_type.String == "MR" {
+			studytype = 4
+		} else if key.Apply_Info.Apply_study_type.String == "DSA" {
+			studytype = 5
+		} else if key.Apply_Info.Apply_study_type.String == "US" {
+			studytype = 6
+		} else if key.Apply_Info.Apply_study_type.String == "ES" {
+			studytype = 7
+		} else if key.Apply_Info.Apply_study_type.String == "PA" {
+			studytype = 8
+		} else if key.Apply_Info.Apply_study_type.String == "NM" {
+			studytype = 9
+		} else if key.Apply_Info.Apply_study_type.String == "PET" {
+			studytype = 10
+		} else {
+			studytype = 99
+		}
+
+		film_flag, _ := strconv.Atoi(key.Apply_Info.Apply_film_flag.String)
+		report_flag, _ := strconv.Atoi(key.Apply_Info.Apply_report_flag.String)
+		mergency_status, _ := strconv.Atoi(key.Apply_Info.Apply_mergency_status.String)
+
+		applyinfo := global.ApplyInfo{
+			Apply_id:                 key.Apply_Info.Apply_id.String,
+			Apply_pat_type_code:      key.Apply_Info.Apply_pat_type_code.String,
+			Apply_pat_type:           pattype,
+			Apply_medical_record:     key.Apply_Info.Apply_medical_record.String,
+			Apply_study_type:         studytype,
+			Apply_checkitems_id:      key.Apply_Info.Apply_checkitems_id.String,
+			Apply_checkitems_name:    key.Apply_Info.Apply_checkitems_name.String,
+			Apply_bodyparts_id:       key.Apply_Info.Apply_bodyparts_id.String,
+			Apply_bodyparts_name:     key.Apply_Info.Apply_bodyparts_name.String,
+			Apply_clinic_id:          key.Apply_Info.Apply_clinic_id.String,
+			Apply_visit_card_no:      key.Apply_Info.Apply_visit_card_no.String,
+			Apply_section_id:         key.Apply_Info.Apply_section_id.String,
+			Apply_section:            key.Apply_Info.Apply_section.String,
+			Apply_sicked_index:       key.Apply_Info.Apply_sicked_index.String,
+			Apply_time:               key.Apply_Info.Apply_time.String,
+			Apply_details_id:         key.Apply_Info.Apply_details_id.String,
+			Apply_clinical_diagnosis: key.Apply_Info.Apply_clinical_diagnosis.String,
+			Apply_illness_history:    key.Apply_Info.Apply_illness_history.String,
+			Apply_department_id:      key.Apply_Info.Apply_department_id.String,
+			Apply_department:         key.Apply_Info.Apply_department.String,
+			Apply_doctor_id:          key.Apply_Info.Apply_doctor_id.String,
+			Apply_doctor:             key.Apply_Info.Apply_doctor.String,
+			Apply_check_note:         key.Apply_Info.Apply_check_note.String,
+			Apply_film_count:         int(key.Apply_Info.Apply_film_count.Int16),
+			Apply_film_flag:          film_flag,
+			Apply_report_flag:        report_flag,
+			Apply_mergency_status:    mergency_status,
+			Apply_fee:                key.Apply_Info.Apply_fee.String,
+		}
+		obj := global.ApplyFormResultData{
+			Apply_Info: applyinfo,
+			Pat_Info:   patinfo,
+		}
+		data = append(data, obj)
+	}
+	return
 }
