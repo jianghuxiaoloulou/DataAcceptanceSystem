@@ -19,7 +19,13 @@ func GetApplyFormData(object global.ApplyFormInfoData) (data []global.ApplyFormR
 		data = hzhis.ByHZHisViewGetApply(object)
 	case global.InterfaceSystem_YYTJZMZZZXZYY:
 		global.Logger.Debug("酉阳土家族苗族自治县中医院")
-		data = zlhis.ByZLHisViewGetApply(object)
+		switch global.DatabaseSetting.HISSqlType {
+		case global.HisMysql:
+			data = zlhis.ByZLHisMysqlView(object)
+		case global.HisOracle:
+			data = zlhis.ByZLHisViewGetApply(object)
+		default:
+		}
 	default:
 	}
 	return

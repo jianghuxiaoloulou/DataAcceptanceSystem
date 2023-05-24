@@ -25,6 +25,7 @@ type DatabaseSettingS struct {
 	MaxIdleConns int
 	MaxOpenConns int
 	MaxLifetime  int
+	HISSqlType   int
 	OracleDBType string
 	OracleDBConn string
 	OracleDBView string
