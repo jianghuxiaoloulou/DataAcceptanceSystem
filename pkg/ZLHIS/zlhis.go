@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -272,11 +273,55 @@ func AuditedWriteBack(data global.ApplyFormStatusData) {
 }
 
 // 通过数据库视图获取申请单数据（Oracle数据库）
-func ByZLHisViewGetApply(object global.ApplyFormInfoData) (data []global.ApplyFormResultData) {
+func ByZLHisViewGetApply(object global.ApplyFormInfoData) (count int, data []global.ApplyFormResultData) {
 	global.Logger.Debug("开始通过中联视图获取数据：")
 	// 查询视图数据
 	param1len := len(object.PARAM)
 	param2len := len(object.PARAM2)
+
+	var patType []string
+	var stuType []string
+
+	for _, value := range object.PatientType {
+		switch value {
+		case global.Pat_Type_MZ:
+			patType = append(patType, "门诊")
+		case global.Pat_Type_ZY:
+			patType = append(patType, "住院")
+		case global.Pat_Type_TJ:
+			patType = append(patType, "体检")
+		default:
+			patType = append(patType, "其他")
+		}
+	}
+
+	for _, stu := range object.StudyType {
+		switch stu {
+		case global.Study_Type_XRay:
+			stuType = append(stuType, "X-Ray")
+		case global.Study_Type_DR:
+			stuType = append(stuType, "DR")
+		case global.Study_Type_CT:
+			stuType = append(stuType, "CT")
+		case global.Study_Type_MR:
+			stuType = append(stuType, "MR")
+		case global.Study_Type_DSA:
+			stuType = append(stuType, "DSA")
+		case global.Study_Type_US:
+			stuType = append(stuType, "US")
+		case global.Study_Type_ES:
+			stuType = append(stuType, "ES")
+		case global.Study_Type_PA:
+			stuType = append(stuType, "PA")
+		case global.Study_Type_NM:
+			stuType = append(stuType, "NM")
+		case global.Study_Type_PET:
+			stuType = append(stuType, "PET")
+		default:
+			stuType = append(stuType, "OT")
+		}
+	}
+
 	sql := `select "his_request_id","patient_name","patient_type_code","patient_type_name","medical_record_number",
 	"sex_code","sex_name",regexp_substr("age",'[0-9]+') age,replace("age", regexp_substr("age",'[0-9]+'), '') age_unit,
 	"birthday","modality_code","project_code","project_name","bodypart_code","bodypart",
@@ -298,10 +343,10 @@ func ByZLHisViewGetApply(object global.ApplyFormInfoData) (data []global.ApplyFo
 			param1str += "\"outpatient_number\" = " + object.PARAM[i].ParamValue
 		case global.Apply_Param_ZYH:
 			param1str += "\"inhospital_number\" = " + object.PARAM[i].ParamValue
-		case global.Apply_Param_KSID:
-			param1str += "\"request_department_code\" = " + object.PARAM[i].ParamValue
+		case global.Apply_Param_BLH:
+			param1str += "\"medical_record_number\" = " + object.PARAM[i].ParamValue
 		case global.Apply_Param_TJH:
-			param1str += "\"request_department_code\" = " + object.PARAM[i].ParamValue
+			param1str += "\"outpatient_number\" = " + object.PARAM[i].ParamValue
 		case global.Apply_Param_MZSQDH:
 			param1str += "\"his_request_id\" = " + object.PARAM[i].ParamValue
 		case global.Apply_Param_ZYSQDH:
@@ -310,14 +355,47 @@ func ByZLHisViewGetApply(object global.ApplyFormInfoData) (data []global.ApplyFo
 			param1str += "\"his_request_id\" = " + object.PARAM[i].ParamValue
 		case global.Apply_Param_SFZH:
 			param1str += "\"id_card_number\" = " + object.PARAM[i].ParamValue
+		case global.Apply_Param_XM:
+			param1str += "\"patient_name\" = " + object.PARAM[i].ParamValue
 		default:
 			param1str += "1 = 1"
 		}
 	}
+	if param1len > 0 {
+		sql += " and("
+		sql += param1str
+		sql += ")"
+	}
 
-	sql += " and("
-	sql += param1str
-	sql += ")"
+	// 参数就诊类型
+	var parampatType string
+	for i := 0; i < len(patType); i++ {
+		if i > 0 {
+			parampatType += ","
+		}
+		parampatType += patType[i]
+	}
+	if len(patType) > 0 {
+		sql += " and("
+		sql += "\"patient_type_name\" in ("
+		sql += parampatType
+		sql += "))"
+	}
+
+	// 参数就诊类型
+	var paramstuType string
+	for i := 0; i < len(stuType); i++ {
+		if i > 0 {
+			paramstuType += ","
+		}
+		paramstuType += stuType[i]
+	}
+	if len(stuType) > 0 {
+		sql += " and("
+		sql += "\"modality_code\" in ("
+		sql += paramstuType
+		sql += "))"
+	}
 
 	// 参数2
 	var param2str string
@@ -335,16 +413,60 @@ func ByZLHisViewGetApply(object global.ApplyFormInfoData) (data []global.ApplyFo
 	sql += param2str
 	sql += ")"
 	global.Logger.Debug("执行的sql语句是: ", sql)
-	data = model.GetZLHisViewApply(sql)
+	count, data = model.GetZLHisViewApply(sql)
 	return
 }
 
 // 通过MySql数据库连接获取数据
-func ByZLHisMysqlView(object global.ApplyFormInfoData) (data []global.ApplyFormResultData) {
+func ByZLHisMysqlView(object global.ApplyFormInfoData) (count int, data []global.ApplyFormResultData) {
 	global.Logger.Debug("开始通过中联视图获取数据：")
 	// 查询视图数据
 	param1len := len(object.PARAM)
 	param2len := len(object.PARAM2)
+
+	var patType []string
+	var stuType []string
+
+	for _, value := range object.PatientType {
+		switch value {
+		case global.Pat_Type_MZ:
+			patType = append(patType, "门诊")
+		case global.Pat_Type_ZY:
+			patType = append(patType, "住院")
+		case global.Pat_Type_TJ:
+			patType = append(patType, "体检")
+		default:
+			patType = append(patType, "其他")
+		}
+	}
+
+	for _, stu := range object.StudyType {
+		switch stu {
+		case global.Study_Type_XRay:
+			stuType = append(stuType, "X-Ray")
+		case global.Study_Type_DR:
+			stuType = append(stuType, "DR")
+		case global.Study_Type_CT:
+			stuType = append(stuType, "CT")
+		case global.Study_Type_MR:
+			stuType = append(stuType, "MR")
+		case global.Study_Type_DSA:
+			stuType = append(stuType, "DSA")
+		case global.Study_Type_US:
+			stuType = append(stuType, "US")
+		case global.Study_Type_ES:
+			stuType = append(stuType, "ES")
+		case global.Study_Type_PA:
+			stuType = append(stuType, "PA")
+		case global.Study_Type_NM:
+			stuType = append(stuType, "NM")
+		case global.Study_Type_PET:
+			stuType = append(stuType, "PET")
+		default:
+			stuType = append(stuType, "OT")
+		}
+	}
+
 	sql := `select his_request_id,patient_name,patient_type_code,patient_type_name,medical_record_number,
 	sex_code,sex_name,age,age_unit,birthday,modality_code,project_code,project_name,bodypart_code,bodypart,
 	outpatient_number,inhospital_number,visit_card_number,phone_number,inp_ward_id,patient_section_name,
@@ -360,31 +482,64 @@ func ByZLHisMysqlView(object global.ApplyFormInfoData) (data []global.ApplyFormR
 		}
 		switch object.PARAM[i].ParamType {
 		case global.Apply_Param_JZKH:
-			param1str += "visit_card_number = " + object.PARAM[i].ParamValue
+			param1str += "visit_card_number = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_MZH:
-			param1str += "outpatient_number = " + object.PARAM[i].ParamValue
+			param1str += "outpatient_number = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_ZYH:
-			param1str += "inhospital_number = " + object.PARAM[i].ParamValue
-		case global.Apply_Param_KSID:
-			param1str += "request_department_code = " + object.PARAM[i].ParamValue
+			param1str += "inhospital_number = '" + object.PARAM[i].ParamValue + "'"
+		case global.Apply_Param_BLH:
+			param1str += "medical_record_number = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_TJH:
-			param1str += "request_department_code = " + object.PARAM[i].ParamValue
+			param1str += "outpatient_number = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_MZSQDH:
-			param1str += "his_request_id = " + object.PARAM[i].ParamValue
+			param1str += "his_request_id = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_ZYSQDH:
-			param1str += "his_request_id = " + object.PARAM[i].ParamValue
+			param1str += "his_request_id = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_TJSQDH:
-			param1str += "his_request_id = " + object.PARAM[i].ParamValue
+			param1str += "his_request_id = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_SFZH:
-			param1str += "id_card_number = " + object.PARAM[i].ParamValue
+			param1str += "id_card_number = '" + object.PARAM[i].ParamValue + "'"
+		case global.Apply_Param_XM:
+			param1str += "patient_name = '" + object.PARAM[i].ParamValue + "'"
 		default:
 			param1str += "1 = 1"
 		}
 	}
+	if param1len > 0 {
+		sql += " and("
+		sql += param1str
+		sql += ")"
+	}
+	// 参数就诊类型
+	var parampatType string
+	for i := 0; i < len(patType); i++ {
+		if i > 0 {
+			parampatType += ","
+		}
+		parampatType += "'" + patType[i] + "'"
+	}
+	if len(patType) > 0 {
+		sql += " and("
+		sql += "patient_type_name in ("
+		sql += parampatType
+		sql += "))"
 
-	sql += " and("
-	sql += param1str
-	sql += ")"
+	}
+
+	// 参数检查类型
+	var paramstuType string
+	for i := 0; i < len(stuType); i++ {
+		if i > 0 {
+			paramstuType += ","
+		}
+		paramstuType += "'" + stuType[i] + "'"
+	}
+	if len(stuType) > 0 {
+		sql += " and("
+		sql += "modality_code in ("
+		sql += paramstuType
+		sql += "))"
+	}
 
 	// 参数2
 	var param2str string
@@ -398,10 +553,20 @@ func ByZLHisMysqlView(object global.ApplyFormInfoData) (data []global.ApplyFormR
 			param2str += "1=1"
 		}
 	}
-	sql += " and ("
-	sql += param2str
-	sql += ")"
+	if param2len > 0 {
+		sql += " and ("
+		sql += param2str
+		sql += ")"
+	}
+
+	// 排序
+
+	// 参数分页
+	if object.StartSize >= 0 && object.EndSize > 0 {
+		sql += " limit "
+		sql += strconv.Itoa(object.StartSize) + "," + strconv.Itoa(object.EndSize)
+	}
 	global.Logger.Debug("执行的sql语句是: ", sql)
-	data = model.GetZLHisViewApply(sql)
+	count, data = model.GetZLHisViewApply(sql)
 	return
 }

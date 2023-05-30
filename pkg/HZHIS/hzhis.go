@@ -25,11 +25,10 @@ type HZApplyData struct {
 }
 
 // 获取申请单数据
-func ByHZHisViewGetApply(object global.ApplyFormInfoData) (data []global.ApplyFormResultData) {
+func ByHZHisViewGetApply(object global.ApplyFormInfoData) (count int, data []global.ApplyFormResultData) {
 	global.Logger.Debug("开始通过华卓HIS视图获取数据：")
 	// 查询视图数据
 	param1len := len(object.PARAM)
-
 	// 参数1
 	for i := 0; i < param1len; i++ {
 		if i > 0 {
@@ -38,50 +37,70 @@ func ByHZHisViewGetApply(object global.ApplyFormInfoData) (data []global.ApplyFo
 		switch object.PARAM[i].ParamType {
 		case global.Apply_Param_JZKH:
 			// 门诊
-			result := model.GetMZViewApply(object.PARAM[i], object.PARAM2)
-			data = append(data, result...)
+			num1, result1 := model.GetMZViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result1...)
+			count += num1
 			// 住院
-			result = model.GetZYViewApply(object.PARAM[i], object.PARAM2)
-			data = append(data, result...)
+			num2, result2 := model.GetZYViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result2...)
+			count += num2
 		case global.Apply_Param_MZH:
 			// 门诊
-			data = model.GetMZViewApply(object.PARAM[i], object.PARAM2)
+			num1, result1 := model.GetMZViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result1...)
+			count += num1
 		case global.Apply_Param_ZYH:
 			// 住院
-			data = model.GetZYViewApply(object.PARAM[i], object.PARAM2)
-		case global.Apply_Param_KSID:
+			num1, result1 := model.GetZYViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result1...)
+			count += num1
+		case global.Apply_Param_BLH:
 		case global.Apply_Param_TJH:
 			// 体检
-			data = model.GetTJViewApply(object.PARAM[i], object.PARAM2)
+			num1, result1 := model.GetTJViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result1...)
+			count += num1
 		case global.Apply_Param_MZSQDH:
 			// 门诊
-			data = model.GetMZViewApply(object.PARAM[i], object.PARAM2)
+			num1, result1 := model.GetMZViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result1...)
+			count += num1
 		case global.Apply_Param_ZYSQDH:
 			// 住院
-			data = model.GetZYViewApply(object.PARAM[i], object.PARAM2)
+			num1, result1 := model.GetZYViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result1...)
+			count += num1
 		case global.Apply_Param_TJSQDH:
 			// 体检
-			data = model.GetTJViewApply(object.PARAM[i], object.PARAM2)
+			num1, result1 := model.GetTJViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result1...)
+			count += num1
 		case global.Apply_Param_SFZH:
 			// 门诊
-			result := model.GetMZViewApply(object.PARAM[i], object.PARAM2)
-			data = append(data, result...)
+			num1, result1 := model.GetMZViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result1...)
+			count += num1
 			// 住院
-			result = model.GetZYViewApply(object.PARAM[i], object.PARAM2)
-			data = append(data, result...)
+			num2, result2 := model.GetZYViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result2...)
+			count += num2
 			// 体检
-			result = model.GetTJViewApply(object.PARAM[i], object.PARAM2)
-			data = append(data, result...)
+			num3, result3 := model.GetTJViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result3...)
+			count += num3
 		default:
 			// 门诊
-			result := model.GetMZViewApply(object.PARAM[i], object.PARAM2)
-			data = append(data, result...)
+			num1, result1 := model.GetMZViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result1...)
+			count += num1
 			// 住院
-			result = model.GetZYViewApply(object.PARAM[i], object.PARAM2)
-			data = append(data, result...)
+			num2, result2 := model.GetZYViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result2...)
+			count += num2
 			// 体检
-			result = model.GetTJViewApply(object.PARAM[i], object.PARAM2)
-			data = append(data, result...)
+			num3, result3 := model.GetTJViewApply(object.PARAM[i], object.PARAM2)
+			data = append(data, result3...)
+			count += num3
 		}
 	}
 	return

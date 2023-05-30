@@ -94,7 +94,7 @@ func ApplyFormInfo(c *gin.Context) {
 	}
 	// 获取患者申请单数据信息
 	var data []global.ApplyFormResultData
-	data = object.GetApplyFormData(applyforminfo)
+	count, data := object.GetApplyFormData(applyforminfo)
 
 	// 返回结果
 	ack_info := global.AckInfo{
@@ -104,6 +104,7 @@ func ApplyFormInfo(c *gin.Context) {
 	result.Bizno = applyforminfo.Bizno
 	result.Time = time.Now().Format("20060102150405")
 	result.PARAM = ack_info
+	result.DataCount = count
 	result.DATA = data
 	c.JSON(http.StatusOK, result)
 }

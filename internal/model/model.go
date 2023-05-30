@@ -3,10 +3,8 @@ package model
 import (
 	"WowjoyProject/DataAcceptanceSystem/pkg/setting"
 	"database/sql"
-	"time"
-
-	_ "github.com/godror/godror"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"time"
 )
 
 // type KeyData struct {

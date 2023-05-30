@@ -6,6 +6,7 @@ import (
 	"WowjoyProject/DataAcceptanceSystem/global"
 	"database/sql"
 	"strconv"
+	"strings"
 )
 
 type ZLHISApply struct {
@@ -74,7 +75,7 @@ type ApplyInfo struct {
 }
 
 // 获取申请单数据
-func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
+func GetZLHisViewApply(sql string) (count int, data []global.ApplyFormResultData) {
 	global.Logger.Debug("开始查询视图数据.....")
 	var err error
 	err = global.OracleDBEngine.Ping()
@@ -89,6 +90,7 @@ func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 	}
 	defer rows.Close()
 	for rows.Next() {
+		count++
 		key := ZLHISApply{}
 		rows.Scan(&key.Apply_Info.Apply_id, &key.Pat_Info.Pat_name, &key.Apply_Info.Apply_pat_type_code, &key.Apply_Info.Apply_pat_type,
 			&key.Apply_Info.Apply_medical_record, &key.Pat_Info.Pat_sex_code, &key.Pat_Info.Pat_sex, &key.Pat_Info.Pat_age, &key.Pat_Info.Pat_age_unit,
@@ -109,7 +111,7 @@ func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 			sex = 9
 		}
 
-		var ageUnit int
+		var ageUnit = 1
 		if key.Pat_Info.Pat_age_unit.String == "岁" {
 			ageUnit = 1
 		} else if key.Pat_Info.Pat_age_unit.String == "月" {
@@ -176,6 +178,46 @@ func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 		report_flag, _ := strconv.Atoi(key.Apply_Info.Apply_report_flag.String)
 		mergency_status, _ := strconv.Atoi(key.Apply_Info.Apply_mergency_status.String)
 
+		// 检查项目检查部位处理
+		checkBodysCode := strings.Split(key.Apply_Info.Apply_bodyparts_id.String, "|")
+		checkBodysName := strings.Split(key.Apply_Info.Apply_bodyparts_name.String, "|")
+		checkItemsCode := strings.Split(key.Apply_Info.Apply_checkitems_id.String, "|")
+		checkItemsName := strings.Split(key.Apply_Info.Apply_checkitems_name.String, "|")
+
+		var bodymap = make(map[string]bool)
+		var bodysarr []global.CheckBody
+
+		for i := 0; i < len(checkBodysCode) && i < len(checkBodysName) && i < len(checkItemsCode) && i < len(checkItemsCode) && i < len(checkItemsName); i++ {
+			var item global.CheckItem
+			var body global.CheckBody
+			var itemsarr []global.CheckItem
+			bodycode := checkBodysCode[i]
+			bodyname := checkBodysName[i]
+			itemcode := checkItemsCode[i]
+			itemname := checkItemsName[i]
+			if bodymap[bodycode] {
+				// 存在
+				item.Apply_check_item_code = itemcode
+				item.Apply_check_item_name = itemname
+				for i := 0; i < len(bodysarr); i++ {
+					if (bodysarr[i].Apply_bodypart_code) == bodycode {
+						bodysarr[i].Apply_checkItems = append(bodysarr[i].Apply_checkItems, item)
+					}
+				}
+
+			} else {
+				// 不存在
+				bodymap[bodycode] = true
+				item.Apply_check_item_code = itemcode
+				item.Apply_check_item_name = itemname
+				itemsarr = append(itemsarr, item)
+				body.Apply_bodypart_code = bodycode
+				body.Apply_bodypart_name = bodyname
+				body.Apply_checkItems = itemsarr
+				bodysarr = append(bodysarr, body)
+			}
+		}
+
 		applyinfo := global.ApplyInfo{
 			Apply_id:                 key.Apply_Info.Apply_id.String,
 			Apply_pat_type_code:      key.Apply_Info.Apply_pat_type_code.String,
@@ -186,6 +228,7 @@ func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 			Apply_checkitems_name:    key.Apply_Info.Apply_checkitems_name.String,
 			Apply_bodyparts_id:       key.Apply_Info.Apply_bodyparts_id.String,
 			Apply_bodyparts_name:     key.Apply_Info.Apply_bodyparts_name.String,
+			Apply_bodys:              bodysarr,
 			Apply_clinic_id:          key.Apply_Info.Apply_clinic_id.String,
 			Apply_visit_card_no:      key.Apply_Info.Apply_visit_card_no.String,
 			Apply_section_id:         key.Apply_Info.Apply_section_id.String,

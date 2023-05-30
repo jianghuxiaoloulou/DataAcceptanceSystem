@@ -1,32 +1,60 @@
 package global
 
+// 就诊类型
+const (
+	Pat_Type_MZ int = 1 // 门诊
+	Pat_Type_ZY int = 2 // 住院
+	Pat_Type_TJ int = 3 // 体检
+	Pat_Type_OT int = 9 // 其它
+)
+
+// 检查类型
+const (
+	Study_Type_XRay int = 1  // X-Ray
+	Study_Type_DR   int = 2  // DR
+	Study_Type_CT   int = 3  // CT
+	Study_Type_MR   int = 4  // MR
+	Study_Type_DSA  int = 5  // DSA
+	Study_Type_US   int = 6  // US
+	Study_Type_ES   int = 7  // ES
+	Study_Type_PA   int = 8  // PA
+	Study_Type_NM   int = 9  // NM
+	Study_Type_PET  int = 10 // PET
+	Study_Type_OT   int = 99 // OT
+)
+
 // 申请单请求参数类型
 const (
-	Apply_Param_JZKH   int = 1 // 就诊卡号
-	Apply_Param_MZH    int = 2 // 门诊号
-	Apply_Param_ZYH    int = 3 // 住院号
-	Apply_Param_KSID   int = 4 // 科室ID
-	Apply_Param_TJH    int = 5 // 体检号
-	Apply_Param_MZSQDH int = 6 // 门诊申请单号
-	Apply_Param_ZYSQDH int = 7 // 住院申请单号
-	Apply_Param_TJSQDH int = 8 // 体检申请单号
-	Apply_Param_SFZH   int = 9 // 身份证号
+	Apply_Param_JZKH   int = 1  // 就诊卡号
+	Apply_Param_MZH    int = 2  // 门诊号
+	Apply_Param_ZYH    int = 3  // 住院号
+	Apply_Param_BLH    int = 4  // 病历号
+	Apply_Param_TJH    int = 5  // 体检号
+	Apply_Param_MZSQDH int = 6  // 门诊申请单号
+	Apply_Param_ZYSQDH int = 7  // 住院申请单号
+	Apply_Param_TJSQDH int = 8  // 体检申请单号
+	Apply_Param_SFZH   int = 9  // 身份证号
+	Apply_Param_XM     int = 10 // 患者姓名
 
 )
 
 // 申请单信息请求
 type ApplyFormInfoData struct {
-	Bizno  string   `json:"bizno" binding:"required"`
-	Time   string   `json:"time" binding:"required"`
-	PARAM  []Param  `json:"req_info"`
-	PARAM2 []Param2 `json:"req_info2"`
+	Bizno       string   `json:"bizno" binding:"required"`
+	Time        string   `json:"time" binding:"required"`
+	PatientType []int    `json:"pat_type"`
+	StudyType   []int    `json:"study_type"`
+	StartSize   int      `json:"start_size"`
+	EndSize     int      `json:"end_size"`
+	SortType    int      `json:"sort_type"`
+	SortValue   int      `json:"sort_value"`
+	PARAM       []Param  `json:"req_info"`
+	PARAM2      []Param2 `json:"req_info2"`
 }
 
 type Param2 struct {
 	StartDate string `json:"start_date"`
 	EndDate   string `json:"end_date"`
-	StartSize int    `json:"start_size"`
-	EndSize   int    `json:"end_size"`
 }
 
 // 申请单返回数据
@@ -38,9 +66,9 @@ type ApplyFormResultData struct {
 // 患者信息
 type PatientInfo struct {
 	Pat_id         string `json:"pat_id" binding:"required"`         // 患者ID
-	Pat_idno       string `json:"Pat_idno"`                          // 身份证号
+	Pat_idno       string `json:"pat_idno"`                          // 身份证号
 	Pat_si_no      string `json:"pat_si_no"`                         // 医保号（患者信息）
-	Pat_name       string `json:"Pat_name" binding:"required"`       // 患者姓名
+	Pat_name       string `json:"pat_name" binding:"required"`       // 患者姓名
 	Pat_spell_name string `json:"pat_spell_name" binding:"required"` // 患者姓名拼音
 	Pat_sex_code   string `json:"pat_sex_code" binding:"required"`   // 患者性别代码
 	Pat_sex        int    `json:"pat_sex" binding:"required"`        // 患者性别：字典：生理性别字典表
@@ -55,9 +83,9 @@ type PatientInfo struct {
 
 // 检查部位
 type CheckBody struct {
-	Apply_bodypart_code string      `json:"ap ply_bodypart_code"` // 检查部位代码
-	Apply_bodypart_name string      `json:"apply_bodypart_name"`  // 检查部位名字
-	Apply_checkItems    []CheckItem `json:"apply_checkitems"`     // 检查项目
+	Apply_bodypart_code string      `json:"apply_bodypart_code"` // 检查部位代码
+	Apply_bodypart_name string      `json:"apply_bodypart_name"` // 检查部位名字
+	Apply_checkItems    []CheckItem `json:"apply_checkitems"`    // 检查项目
 }
 
 // 检查项目
@@ -115,8 +143,9 @@ type ApplyInfo struct {
 // 返回结果
 // 申请单状态返回
 type ApplyFormInfoResult struct {
-	Bizno string                `json:"bizno"`
-	Time  string                `json:"time"`
-	PARAM AckInfo               `json:"ack_info"`
-	DATA  []ApplyFormResultData `json:"data"`
+	Bizno     string                `json:"bizno"`
+	Time      string                `json:"time"`
+	PARAM     AckInfo               `json:"ack_info"`
+	DataCount int                   `json:"data_count"`
+	DATA      []ApplyFormResultData `json:"data"`
 }

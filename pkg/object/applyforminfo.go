@@ -7,7 +7,7 @@ import (
 )
 
 // 获取申请单数据
-func GetApplyFormData(object global.ApplyFormInfoData) (data []global.ApplyFormResultData) {
+func GetApplyFormData(object global.ApplyFormInfoData) (count int, data []global.ApplyFormResultData) {
 	// 1. 通过存储过程获取数据
 	// 2. 通过接口获取数据
 	// 3. 通过接口推送数据（创建数据库接受数据）
@@ -16,14 +16,14 @@ func GetApplyFormData(object global.ApplyFormInfoData) (data []global.ApplyFormR
 	switch global.ObjectSetting.InterfaceSystemType {
 	case global.InterfaceSystem_SLHZYY:
 		global.Logger.Debug("树兰医院")
-		data = hzhis.ByHZHisViewGetApply(object)
+		count, data = hzhis.ByHZHisViewGetApply(object)
 	case global.InterfaceSystem_YYTJZMZZZXZYY:
 		global.Logger.Debug("酉阳土家族苗族自治县中医院")
 		switch global.DatabaseSetting.HISSqlType {
 		case global.HisMysql:
-			data = zlhis.ByZLHisMysqlView(object)
+			count, data = zlhis.ByZLHisMysqlView(object)
 		case global.HisOracle:
-			data = zlhis.ByZLHisViewGetApply(object)
+			count, data = zlhis.ByZLHisViewGetApply(object)
 		default:
 		}
 	default:

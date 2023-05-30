@@ -137,7 +137,7 @@ type TJApplyInfoSqlServer struct {
 }
 
 // 获取门诊申请单数据
-func GetMZViewApply(param global.Param, param2 []global.Param2) (data []global.ApplyFormResultData) {
+func GetMZViewApply(param global.Param, param2 []global.Param2) (count int, data []global.ApplyFormResultData) {
 	global.Logger.Debug("通过门诊号获取申请单数.....")
 	var err error
 	sql := `select "SQJLID","SQMXID","BRSQHM","BRJZHM","BRJZXH","BRDAXM","BRDAXB","BRCSRQ","BRJZNL",
@@ -322,7 +322,7 @@ func GetMZViewApply(param global.Param, param2 []global.Param2) (data []global.A
 }
 
 // 获取住院申请单数据
-func GetZYViewApply(param global.Param, param2 []global.Param2) (data []global.ApplyFormResultData) {
+func GetZYViewApply(param global.Param, param2 []global.Param2) (count int, data []global.ApplyFormResultData) {
 	global.Logger.Debug("通过门诊号获取申请单数.....")
 	var err error
 	sql := `select "SQJLID","SQMXID","BRJZHM","BRZYID","BRSQHM","BRDAXM","BRDAXB","BRCSRQ","BRJZNL",
@@ -515,7 +515,7 @@ func GetZYViewApply(param global.Param, param2 []global.Param2) (data []global.A
 }
 
 // 获取体检申请单数据
-func GetTJViewApply(param global.Param, param2 []global.Param2) (data []global.ApplyFormResultData) {
+func GetTJViewApply(param global.Param, param2 []global.Param2) (count int, data []global.ApplyFormResultData) {
 	global.Logger.Debug("通过门诊号获取申请单数.....")
 	var err error
 	sql := `select "sqjlid","tijianbm","xingming","xingbie","ylxh","zuhexmmc","sfzh","jianchalx","TIJIANRQ",
