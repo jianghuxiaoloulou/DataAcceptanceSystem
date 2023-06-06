@@ -338,25 +338,27 @@ func ByZLHisViewGetApply(object global.ApplyFormInfoData) (count int, data []glo
 		}
 		switch object.PARAM[i].ParamType {
 		case global.Apply_Param_JZKH:
-			param1str += "\"visit_card_number\" = " + object.PARAM[i].ParamValue
+			param1str += "\"visit_card_number\" = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_MZH:
-			param1str += "\"outpatient_number\" = " + object.PARAM[i].ParamValue
+			param1str += "\"outpatient_number\" = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_ZYH:
-			param1str += "\"inhospital_number\" = " + object.PARAM[i].ParamValue
+			param1str += "\"inhospital_number\" = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_BLH:
-			param1str += "\"medical_record_number\" = " + object.PARAM[i].ParamValue
+			param1str += "\"medical_record_number\" = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_TJH:
-			param1str += "\"outpatient_number\" = " + object.PARAM[i].ParamValue
+			param1str += "\"outpatient_number\" = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_MZSQDH:
-			param1str += "\"his_request_id\" = " + object.PARAM[i].ParamValue
+			param1str += "\"his_request_id\" = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_ZYSQDH:
-			param1str += "\"his_request_id\" = " + object.PARAM[i].ParamValue
+			param1str += "\"his_request_id\" = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_TJSQDH:
-			param1str += "\"his_request_id\" = " + object.PARAM[i].ParamValue
+			param1str += "\"his_request_id\" = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_SFZH:
-			param1str += "\"id_card_number\" = " + object.PARAM[i].ParamValue
+			param1str += "\"id_card_number\" = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_XM:
-			param1str += "\"patient_name\" = " + object.PARAM[i].ParamValue
+			param1str += "\"patient_name\" = '" + object.PARAM[i].ParamValue + "'"
+		case global.Apply_Param_JZ:
+			param1str += "\"emergency\" = '" + object.PARAM[i].ParamValue + "'"
 		default:
 			param1str += "1 = 1"
 		}
@@ -373,7 +375,7 @@ func ByZLHisViewGetApply(object global.ApplyFormInfoData) (count int, data []glo
 		if i > 0 {
 			parampatType += ","
 		}
-		parampatType += patType[i]
+		parampatType += "'" + patType[i] + "'"
 	}
 	if len(patType) > 0 {
 		sql += " and("
@@ -382,13 +384,13 @@ func ByZLHisViewGetApply(object global.ApplyFormInfoData) (count int, data []glo
 		sql += "))"
 	}
 
-	// 参数就诊类型
+	// 参数检查类型
 	var paramstuType string
 	for i := 0; i < len(stuType); i++ {
 		if i > 0 {
 			paramstuType += ","
 		}
-		paramstuType += stuType[i]
+		paramstuType += "'" + stuType[i] + "'"
 	}
 	if len(stuType) > 0 {
 		sql += " and("
@@ -409,11 +411,24 @@ func ByZLHisViewGetApply(object global.ApplyFormInfoData) (count int, data []glo
 			param2str += "1=1"
 		}
 	}
-	sql += " and ("
-	sql += param2str
-	sql += ")"
+	if param2len > 0 {
+		sql += " and ("
+		sql += param2str
+		sql += ")"
+	}
+
+	// 排序
+	// 单独返回条件数据总数(不仅仅是分页后的数据)
+	count = model.GetDataCount(sql)
+
+	// 分页
+	if object.StartSize >= 0 && object.EndSize > 0 {
+		sql += " and rownum between "
+		sql += strconv.Itoa(object.StartSize) + " and " + strconv.Itoa(object.EndSize)
+	}
+
 	global.Logger.Debug("执行的sql语句是: ", sql)
-	count, data = model.GetZLHisViewApply(sql)
+	data = model.GetZLHisViewApply(sql)
 	return
 }
 
@@ -501,6 +516,8 @@ func ByZLHisMysqlView(object global.ApplyFormInfoData) (count int, data []global
 			param1str += "id_card_number = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_XM:
 			param1str += "patient_name = '" + object.PARAM[i].ParamValue + "'"
+		case global.Apply_Param_JZ:
+			param1str += "emergency = '" + object.PARAM[i].ParamValue + "'"
 		default:
 			param1str += "1 = 1"
 		}
@@ -560,13 +577,14 @@ func ByZLHisMysqlView(object global.ApplyFormInfoData) (count int, data []global
 	}
 
 	// 排序
-
+	// 单独返回条件数据总数(不仅仅是分页后的数据)
+	count = model.GetDataCount(sql)
 	// 参数分页
 	if object.StartSize >= 0 && object.EndSize > 0 {
 		sql += " limit "
 		sql += strconv.Itoa(object.StartSize) + "," + strconv.Itoa(object.EndSize)
 	}
 	global.Logger.Debug("执行的sql语句是: ", sql)
-	count, data = model.GetZLHisViewApply(sql)
+	data = model.GetZLHisViewApply(sql)
 	return
 }

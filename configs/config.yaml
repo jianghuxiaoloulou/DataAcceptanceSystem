@@ -25,7 +25,7 @@ Database:
   HISSqlType: 1
   # mysql数据库配置
   OracleDBType: mysql
-  OracleDBConn: espacs:Wowjoy@2018@tcp(172.16.255.26:30117)/ms_qypacs?charset=utf8
+  OracleDBConn: sunzegang:sunzegang@2023@tcp(172.16.255.26:35917)/ms_qypacs?charset=utf8
   OracleDBView: V_PACS_HZ
   # HIS数据库连接oracle数据库配置
   #OracleDBType: godror

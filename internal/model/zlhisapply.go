@@ -75,7 +75,7 @@ type ApplyInfo struct {
 }
 
 // 获取申请单数据
-func GetZLHisViewApply(sql string) (count int, data []global.ApplyFormResultData) {
+func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 	global.Logger.Debug("开始查询视图数据.....")
 	var err error
 	err = global.OracleDBEngine.Ping()
@@ -90,7 +90,6 @@ func GetZLHisViewApply(sql string) (count int, data []global.ApplyFormResultData
 	}
 	defer rows.Close()
 	for rows.Next() {
-		count++
 		key := ZLHISApply{}
 		rows.Scan(&key.Apply_Info.Apply_id, &key.Pat_Info.Pat_name, &key.Apply_Info.Apply_pat_type_code, &key.Apply_Info.Apply_pat_type,
 			&key.Apply_Info.Apply_medical_record, &key.Pat_Info.Pat_sex_code, &key.Pat_Info.Pat_sex, &key.Pat_Info.Pat_age, &key.Pat_Info.Pat_age_unit,
@@ -254,6 +253,27 @@ func GetZLHisViewApply(sql string) (count int, data []global.ApplyFormResultData
 			Pat_Info:   patinfo,
 		}
 		data = append(data, obj)
+	}
+	return
+}
+
+// 获取数据总数
+func GetDataCount(sql string) (count int) {
+	global.Logger.Debug("开始查询条件数据总数.....")
+	var err error
+	err = global.OracleDBEngine.Ping()
+	if err != nil {
+		global.Logger.Error(err.Error())
+		global.OracleDBEngine, _ = NewOracleDBEngine(global.DatabaseSetting)
+	}
+	rows, err := global.OracleDBEngine.Query(sql)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		count++
 	}
 	return
 }

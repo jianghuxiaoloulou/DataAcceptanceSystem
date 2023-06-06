@@ -35,7 +35,7 @@ const (
 	Apply_Param_TJSQDH int = 8  // 体检申请单号
 	Apply_Param_SFZH   int = 9  // 身份证号
 	Apply_Param_XM     int = 10 // 患者姓名
-
+	Apply_Param_JZ     int = 11 //急诊
 )
 
 // 申请单信息请求
@@ -101,6 +101,7 @@ type CheckItem struct {
 type ApplyInfo struct {
 	Apply_hospital_id            string      `json:"apply_hospital_id" binding:"required"`     // 医院编号
 	Apply_id                     string      `json:"apply_id" binding:"required"`              // 申请单号
+	Apply_jlid                   string      `json:"apply_jlid"`                               // 申请记录ID
 	Apply_status                 int         `json:"apply_status" binding:"required"`          // 申请单状态
 	Apply_time                   string      `json:"apply_time" binding:"required"`            // 申请时间:格式：yyyy-MM-dd HH:mm:ss
 	Apply_department_id          string      `json:"apply_department_id"`                      // 申请科室ID

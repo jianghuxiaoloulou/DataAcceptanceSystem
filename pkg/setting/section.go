@@ -34,6 +34,7 @@ type DatabaseSettingS struct {
 type ObjectSettingS struct {
 	InterfaceSystemType int
 	HISURL              string
+	Shenqingdan         []string
 }
 
 func (s *Setting) ReadSection(k string, v interface{}) error {
