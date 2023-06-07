@@ -338,27 +338,27 @@ func ByZLHisViewGetApply(object global.ApplyFormInfoData) (count int, data []glo
 		}
 		switch object.PARAM[i].ParamType {
 		case global.Apply_Param_JZKH:
-			param1str += "\"visit_card_number\" = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "\"visit_card_number\" like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_MZH:
-			param1str += "\"outpatient_number\" = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "\"outpatient_number\" like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_ZYH:
-			param1str += "\"inhospital_number\" = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "\"inhospital_number\" like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_BLH:
-			param1str += "\"medical_record_number\" = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "\"medical_record_number\" like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_TJH:
-			param1str += "\"outpatient_number\" = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "\"outpatient_number\" like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_MZSQDH:
-			param1str += "\"his_request_id\" = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "\"his_request_id\" like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_ZYSQDH:
-			param1str += "\"his_request_id\" = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "\"his_request_id\" like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_TJSQDH:
-			param1str += "\"his_request_id\" = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "\"his_request_id\" like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_SFZH:
-			param1str += "\"id_card_number\" = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "\"id_card_number\" like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_XM:
-			param1str += "\"patient_name\" = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "\"patient_name\" like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_JZ:
-			param1str += "\"emergency\" = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "\"emergency\" like '%" + object.PARAM[i].ParamValue + "%'"
 		default:
 			param1str += "1 = 1"
 		}
@@ -497,27 +497,27 @@ func ByZLHisMysqlView(object global.ApplyFormInfoData) (count int, data []global
 		}
 		switch object.PARAM[i].ParamType {
 		case global.Apply_Param_JZKH:
-			param1str += "visit_card_number = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "visit_card_number like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_MZH:
-			param1str += "outpatient_number = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "outpatient_number like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_ZYH:
-			param1str += "inhospital_number = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "inhospital_number like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_BLH:
-			param1str += "medical_record_number = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "medical_record_number like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_TJH:
-			param1str += "outpatient_number = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "outpatient_number like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_MZSQDH:
-			param1str += "his_request_id = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "his_request_id like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_ZYSQDH:
-			param1str += "his_request_id = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "his_request_id like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_TJSQDH:
-			param1str += "his_request_id = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "his_request_id like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_SFZH:
-			param1str += "id_card_number = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "id_card_number like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_XM:
-			param1str += "patient_name = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "patient_name like '%" + object.PARAM[i].ParamValue + "%'"
 		case global.Apply_Param_JZ:
-			param1str += "emergency = '" + object.PARAM[i].ParamValue + "'"
+			param1str += "emergency like '%" + object.PARAM[i].ParamValue + "%'"
 		default:
 			param1str += "1 = 1"
 		}
