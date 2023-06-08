@@ -44,7 +44,8 @@ type ApplyInfo struct {
 	Apply_doctor                 sql.NullString // 申请医生
 	Apply_pat_type_code          sql.NullString // 患者类别CODE(IH/OP)
 	Apply_pat_type               sql.NullString // 患者类别
-	Apply_clinic_id              sql.NullString // 门诊号:（门诊特有）住院号:（住院特有）体检健康号:（体检特有）
+	Apply_outpatient_id          sql.NullString // 门诊号
+	Apply_inhospital_id          sql.NullString // 住院号
 	Apply_visit_card_no          sql.NullString // 就诊卡号
 	Apply_medical_record         sql.NullString // 病历号
 	Apply_pat_body_sign          sql.NullString // 体征
@@ -58,15 +59,19 @@ type ApplyInfo struct {
 	Apply_film_count             sql.NullInt16  // 胶片数量
 	Apply_film_flag              sql.NullString // 胶片标志
 	Apply_fee                    sql.NullString // 费用
+	Apply_rmethod_name           sql.NullString // 检查方法
 	Apply_vip_flag               sql.NullInt16  // 病人VIP标志
 	Apply_isolation_flag         sql.NullInt16  // 隔离标志
+	Apply_greenchan_flag         sql.NullInt16  // 绿色通道
 	Apply_mergency_status        sql.NullString // 急诊状态
 	Apply_study_type             sql.NullString // 检查类型 （CT/MR 检查类别字典表）
 	Apply_bodyparts_id           sql.NullString // 检查部位ID:多部位用|分割
 	Apply_bodyparts_name         sql.NullString // 检查部位名称：多部位用|分割
 	Apply_checkitems_id          sql.NullString // 检查项目ID：多个用|分割
 	Apply_checkitems_name        sql.NullString // 检查项目名称：多个用|分割
+	Apply_checkitems_note        sql.NullString // 检查项目备注：多个用|分割
 	Apply_details_id             sql.NullString // 项目明细ID：多个用|分割
+	Apply_checkitems_count       sql.NullInt16  // 检查项目数量
 	Apply_check_note             sql.NullString // 检查备注
 	Apply_check_room             sql.NullString // 检查机房
 	Apply_section_id             sql.NullString // 病区名称ID：（住院特有）
@@ -94,12 +99,12 @@ func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 		rows.Scan(&key.Apply_Info.Apply_id, &key.Pat_Info.Pat_name, &key.Apply_Info.Apply_pat_type_code, &key.Apply_Info.Apply_pat_type,
 			&key.Apply_Info.Apply_medical_record, &key.Pat_Info.Pat_sex_code, &key.Pat_Info.Pat_sex, &key.Pat_Info.Pat_age, &key.Pat_Info.Pat_age_unit,
 			&key.Pat_Info.Pat_brsdate, &key.Apply_Info.Apply_study_type, &key.Apply_Info.Apply_checkitems_id, &key.Apply_Info.Apply_checkitems_name,
-			&key.Apply_Info.Apply_bodyparts_id, &key.Apply_Info.Apply_bodyparts_name, &key.Apply_Info.Apply_clinic_id, &key.Apply_Info.Apply_clinic_id,
+			&key.Apply_Info.Apply_checkitems_note, &key.Apply_Info.Apply_bodyparts_id, &key.Apply_Info.Apply_bodyparts_name, &key.Apply_Info.Apply_checkitems_count, &key.Apply_Info.Apply_outpatient_id, &key.Apply_Info.Apply_inhospital_id,
 			&key.Apply_Info.Apply_visit_card_no, &key.Pat_Info.Pat_tel, &key.Apply_Info.Apply_section_id, &key.Apply_Info.Apply_section, &key.Apply_Info.Apply_sicked_index,
 			&key.Apply_Info.Apply_time, &key.Apply_Info.Apply_details_id, &key.Pat_Info.Pat_idno, &key.Pat_Info.Pat_addr, &key.Apply_Info.Apply_clinical_diagnosis,
 			&key.Apply_Info.Apply_illness_history, &key.Apply_Info.Apply_department_id, &key.Apply_Info.Apply_department, &key.Apply_Info.Apply_doctor_id,
 			&key.Apply_Info.Apply_doctor, &key.Apply_Info.Apply_check_note, &key.Apply_Info.Apply_film_count, &key.Apply_Info.Apply_film_flag, &key.Apply_Info.Apply_report_flag,
-			&key.Apply_Info.Apply_mergency_status, &key.Apply_Info.Apply_fee)
+			&key.Apply_Info.Apply_mergency_status, &key.Apply_Info.Apply_isolation_flag, &key.Apply_Info.Apply_greenchan_flag, &key.Apply_Info.Apply_fee, &key.Apply_Info.Apply_checkitems_count)
 
 		var sex int
 		if key.Pat_Info.Pat_sex.String == "男" {
@@ -139,15 +144,20 @@ func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 			Pat_addr:     key.Pat_Info.Pat_addr.String,
 		}
 
+		var apply_clinic_id string
 		var pattype int
 		if key.Apply_Info.Apply_pat_type.String == "门诊" {
 			pattype = 1
+			apply_clinic_id = key.Apply_Info.Apply_outpatient_id.String
 		} else if key.Apply_Info.Apply_pat_type.String == "住院" {
 			pattype = 2
+			apply_clinic_id = key.Apply_Info.Apply_inhospital_id.String
 		} else if key.Apply_Info.Apply_pat_type.String == "体检" {
 			pattype = 3
+			apply_clinic_id = key.Apply_Info.Apply_outpatient_id.String
 		} else {
 			pattype = 9
+			apply_clinic_id = key.Apply_Info.Apply_outpatient_id.String
 		}
 
 		var studytype int
@@ -182,6 +192,8 @@ func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 		checkBodysName := strings.Split(key.Apply_Info.Apply_bodyparts_name.String, "|")
 		checkItemsCode := strings.Split(key.Apply_Info.Apply_checkitems_id.String, "|")
 		checkItemsName := strings.Split(key.Apply_Info.Apply_checkitems_name.String, "|")
+		checkItemsNote := strings.Split(key.Apply_Info.Apply_checkitems_note.String, "|")
+		requestdetailid := strings.Split(key.Apply_Info.Apply_details_id.String, "|")
 
 		var bodymap = make(map[string]bool)
 		var bodysarr []global.CheckBody
@@ -194,10 +206,22 @@ func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 			bodyname := checkBodysName[i]
 			itemcode := checkItemsCode[i]
 			itemname := checkItemsName[i]
+			var itemnote string
+			var itemdetailid string
+			if i < len(checkItemsNote) {
+				itemnote = checkItemsNote[i]
+			}
+
+			if i < len(requestdetailid) {
+				itemdetailid = requestdetailid[i]
+			}
+
 			if bodymap[bodycode] {
 				// 存在
 				item.Apply_check_item_code = itemcode
 				item.Apply_check_item_name = itemname
+				item.Apply_points_note = itemnote
+				item.Apply_detail_id = itemdetailid
 				for i := 0; i < len(bodysarr); i++ {
 					if (bodysarr[i].Apply_bodypart_code) == bodycode {
 						bodysarr[i].Apply_checkItems = append(bodysarr[i].Apply_checkItems, item)
@@ -209,6 +233,8 @@ func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 				bodymap[bodycode] = true
 				item.Apply_check_item_code = itemcode
 				item.Apply_check_item_name = itemname
+				item.Apply_points_note = itemnote
+				item.Apply_detail_id = itemdetailid
 				itemsarr = append(itemsarr, item)
 				body.Apply_bodypart_code = bodycode
 				body.Apply_bodypart_name = bodyname
@@ -228,7 +254,7 @@ func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 			Apply_bodyparts_id:       key.Apply_Info.Apply_bodyparts_id.String,
 			Apply_bodyparts_name:     key.Apply_Info.Apply_bodyparts_name.String,
 			Apply_bodys:              bodysarr,
-			Apply_clinic_id:          key.Apply_Info.Apply_clinic_id.String,
+			Apply_clinic_id:          apply_clinic_id,
 			Apply_visit_card_no:      key.Apply_Info.Apply_visit_card_no.String,
 			Apply_section_id:         key.Apply_Info.Apply_section_id.String,
 			Apply_section:            key.Apply_Info.Apply_section.String,
@@ -245,6 +271,8 @@ func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 			Apply_film_count:         int(key.Apply_Info.Apply_film_count.Int16),
 			Apply_film_flag:          film_flag,
 			Apply_report_flag:        report_flag,
+			Apply_isolation_flag:     int(key.Apply_Info.Apply_isolation_flag.Int16),
+			Apply_greenchan_flag:     int(key.Apply_Info.Apply_greenchan_flag.Int16),
 			Apply_mergency_status:    mergency_status,
 			Apply_fee:                key.Apply_Info.Apply_fee.String,
 		}
