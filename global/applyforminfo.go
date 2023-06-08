@@ -44,8 +44,8 @@ type ApplyFormInfoData struct {
 	Time        string   `json:"time" binding:"required"`
 	PatientType []int    `json:"pat_type"`
 	StudyType   []int    `json:"study_type"`
-	StartSize   int      `json:"start_size"`
-	EndSize     int      `json:"end_size"`
+	StartSize   int      `json:"page_num"`
+	EndSize     int      `json:"page_size"`
 	SortType    int      `json:"sort_type"`
 	SortValue   int      `json:"sort_value"`
 	PARAM       []Param  `json:"req_info"`

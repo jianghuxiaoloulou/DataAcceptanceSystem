@@ -585,10 +585,11 @@ func ByZLHisMysqlView(object global.ApplyFormInfoData) (count int, data []global
 
 	// 单独返回条件数据总数(不仅仅是分页后的数据)
 	count = model.GetDataCount(sql)
+	pagenum := (object.StartSize - 1) * object.EndSize
 	// 参数分页
-	if object.StartSize >= 0 && object.EndSize > 0 {
+	if object.StartSize >= 1 && object.EndSize > 0 {
 		sql += " limit "
-		sql += strconv.Itoa(object.StartSize) + "," + strconv.Itoa(object.EndSize)
+		sql += strconv.Itoa(pagenum) + "," + strconv.Itoa(object.EndSize)
 	}
 	global.Logger.Debug("执行的sql语句是: ", sql)
 	data = model.GetZLHisViewApply(sql)
