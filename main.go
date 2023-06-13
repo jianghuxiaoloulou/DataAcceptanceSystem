@@ -2,20 +2,13 @@ package main
 
 import (
 	"WowjoyProject/DataAcceptanceSystem/global"
-	"WowjoyProject/DataAcceptanceSystem/internal/model"
+	initialize "WowjoyProject/DataAcceptanceSystem/internal/init"
 	"WowjoyProject/DataAcceptanceSystem/internal/routers"
-	"WowjoyProject/DataAcceptanceSystem/pkg/logger"
 	"WowjoyProject/DataAcceptanceSystem/pkg/object"
-	"WowjoyProject/DataAcceptanceSystem/pkg/setting"
 	"WowjoyProject/DataAcceptanceSystem/pkg/workpattern"
-	"io"
-	"log"
 	"net/http"
-	"os"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 // @title PACS集成平台
@@ -23,7 +16,7 @@ import (
 // @description PACS集成平台
 // @termsOfService https://github.com/jianghuxiaoloulou/DataAcceptanceSystem.git
 func main() {
-	readSetup()
+	initialize.ReadSetup()
 	global.Logger.Info("***开始运行PACS集成平台服务***")
 	global.ApplyFormStatusDataChan = make(chan global.ApplyFormStatusData, global.GeneralSetting.MaxThreads)
 	// 注册工作池，传入任务
@@ -73,93 +66,4 @@ func web() {
 		MaxHeaderBytes: 1 << 20,
 	}
 	ser.ListenAndServe()
-}
-
-func setupSetting() error {
-	setting, err := setting.NewSetting()
-	if err != nil {
-		return err
-	}
-	err = setting.ReadSection("Server", &global.ServerSetting)
-	if err != nil {
-		return err
-	}
-	err = setting.ReadSection("General", &global.GeneralSetting)
-	if err != nil {
-		return err
-	}
-	err = setting.ReadSection("Database", &global.DatabaseSetting)
-	if err != nil {
-		return err
-	}
-
-	err = setting.ReadSection("Object", &global.ObjectSetting)
-	if err != nil {
-		return err
-	}
-
-	global.ServerSetting.ReadTimeout *= time.Second
-	global.ServerSetting.WriteTimeout *= time.Second
-	return nil
-}
-
-func setupLogger() error {
-	lunberLogger := &lumberjack.Logger{
-		Filename:  global.GeneralSetting.LogSavePath + "/" + global.GeneralSetting.LogFileName + global.GeneralSetting.LogFileExt,
-		MaxSize:   global.GeneralSetting.LogMaxSize,
-		MaxAge:    global.GeneralSetting.LogMaxAge,
-		LocalTime: true,
-	}
-	global.Logger = logger.NewLogger(io.MultiWriter(lunberLogger, os.Stdout), "", log.LstdFlags).WithCaller(2)
-	return nil
-}
-
-func setupReadDBEngine() error {
-	var err error
-	global.ReadDBEngine, err = model.NewDBEngine(global.DatabaseSetting)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func setupWriteDBEngine() error {
-	var err error
-	global.WriteDBEngine, err = model.NewDBEngine(global.DatabaseSetting)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func setupOracleDBEngine() error {
-	var err error
-	global.OracleDBEngine, err = model.NewOracleDBEngine(global.DatabaseSetting)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func readSetup() {
-	err := setupSetting()
-	if err != nil {
-		log.Fatalf("init.setupSetting err: %v", err)
-	}
-	err = setupLogger()
-	if err != nil {
-		log.Fatalf("init.setupLogger err: %v", err)
-	}
-	err = setupReadDBEngine()
-	if err != nil {
-		log.Fatalf("init.setupReadDBEngine err: %v", err)
-	}
-	err = setupWriteDBEngine()
-	if err != nil {
-		log.Fatalf("init.setupWriteDBEngine err: %v", err)
-	}
-	err = setupOracleDBEngine()
-	if err != nil {
-		log.Fatalf("init.setupOracleDBEngine err: %v", err)
-	}
 }

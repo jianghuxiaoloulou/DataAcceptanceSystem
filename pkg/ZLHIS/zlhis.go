@@ -477,8 +477,10 @@ func ByZLHisMysqlView(object global.ApplyFormInfoData) (count int, data []global
 			stuType = append(stuType, "NM")
 		case global.Study_Type_PET:
 			stuType = append(stuType, "PET")
-		default:
+		case global.Study_Type_OT:
 			stuType = append(stuType, "OT")
+		default:
+			stuType = append(stuType, "-")
 		}
 	}
 
