@@ -357,8 +357,6 @@ func ByZLHisViewGetApply(object global.ApplyFormInfoData) (count int, data []glo
 			param1str += "\"id_card_number\" = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_XM:
 			param1str += "\"patient_name\" = '" + object.PARAM[i].ParamValue + "'"
-		case global.Apply_Param_JZ:
-			param1str += "\"emergency\" = '" + object.PARAM[i].ParamValue + "'"
 		default:
 			param1str += "1 = 1"
 		}
@@ -399,6 +397,10 @@ func ByZLHisViewGetApply(object global.ApplyFormInfoData) (count int, data []glo
 		sql += "))"
 	}
 
+	// 参数急诊状态 0-非急诊，1-急诊，2-全部数据
+	if object.MergencySta != 2 {
+		sql += " and \"emergency\" = '" + strconv.Itoa(object.MergencySta) + "'"
+	}
 	// 参数2
 	var param2str string
 	for i := 0; i < param2len; i++ {
@@ -435,13 +437,17 @@ func ByZLHisViewGetApply(object global.ApplyFormInfoData) (count int, data []glo
 // 通过MySql数据库连接获取数据
 func ByZLHisMysqlView(object global.ApplyFormInfoData) (count int, data []global.ApplyFormResultData) {
 	global.Logger.Debug("开始通过中联视图获取数据：")
-	// 查询视图数据
-	param1len := len(object.PARAM)
-	param2len := len(object.PARAM2)
+	var sql string
+	sql = `select his_request_id,patient_name,patient_type_code,patient_type_name,medical_record_number,
+		sex_code,sex_name,age,age_unit,birthday,modality_code,project_code,project_name,project_note,bodypart_code,bodypart,
+		project_count,outpatient_number,inhospital_number,visit_card_number,phone_number,inp_ward_id,patient_section_name,
+		sickbed_number,request_time,his_request_detail_id,id_card_number,address,clinical_diagnosis,medical_history,
+		request_department_code,request_department_name,request_doctor_code,request_doctor_name,check_note,film_count,
+		film_type,graphic_report,emergency,isolation_flag,greenchan_flag,fee,rmethod_name 
+		from V_PACS_HZ where 1 = 1 `
 
+	// 就诊类型参数
 	var patType []string
-	var stuType []string
-
 	for _, value := range object.PatientType {
 		switch value {
 		case global.Pat_Type_MZ:
@@ -454,7 +460,22 @@ func ByZLHisMysqlView(object global.ApplyFormInfoData) (count int, data []global
 			patType = append(patType, "其他")
 		}
 	}
+	var parampatType string
+	for i := 0; i < len(patType); i++ {
+		if i > 0 {
+			parampatType += ","
+		}
+		parampatType += "'" + patType[i] + "'"
+	}
+	if len(patType) > 0 {
+		sql += " and("
+		sql += "\"patient_type_name\" in ("
+		sql += parampatType
+		sql += "))"
+	}
 
+	// 检查类型
+	var stuType []string
 	for _, stu := range object.StudyType {
 		switch stu {
 		case global.Study_Type_XRay:
@@ -483,15 +504,31 @@ func ByZLHisMysqlView(object global.ApplyFormInfoData) (count int, data []global
 			stuType = append(stuType, "-")
 		}
 	}
+	var paramstuType string
+	for i := 0; i < len(stuType); i++ {
+		if i > 0 {
+			paramstuType += ","
+		}
+		paramstuType += "'" + stuType[i] + "'"
+	}
+	if len(stuType) > 0 {
+		sql += " and("
+		sql += "modality_code in ("
+		sql += paramstuType
+		sql += "))"
+	}
 
-	sql := `select his_request_id,patient_name,patient_type_code,patient_type_name,medical_record_number,
-	sex_code,sex_name,age,age_unit,birthday,modality_code,project_code,project_name,project_note,bodypart_code,bodypart,
-	project_count,outpatient_number,inhospital_number,visit_card_number,phone_number,inp_ward_id,patient_section_name,
-	sickbed_number,request_time,his_request_detail_id,id_card_number,address,clinical_diagnosis,medical_history,
-	request_department_code,request_department_name,request_doctor_code,request_doctor_name,check_note,film_count,
-	film_type,graphic_report,emergency,isolation_flag,greenchan_flag,fee,rmethod_name 
-	from V_PACS_HZ where 1 = 1`
-	// 参数1
+	// 急诊状态 0-所有数据，1-急诊数据，2-非急诊数据
+	switch object.MergencySta {
+	case global.Mergency_Type_True:
+		sql += " and emergency = '" + strconv.Itoa(object.MergencySta) + "'"
+	case global.Mergency_Type_False:
+		sql += " and emergency = '" + strconv.Itoa(object.MergencySta) + "'"
+	default:
+	}
+
+	// 参数关键值
+	param1len := len(object.PARAM)
 	var param1str string
 	for i := 0; i < param1len; i++ {
 		if i > 0 {
@@ -518,8 +555,6 @@ func ByZLHisMysqlView(object global.ApplyFormInfoData) (count int, data []global
 			param1str += "id_card_number = '" + object.PARAM[i].ParamValue + "'"
 		case global.Apply_Param_XM:
 			param1str += "patient_name = '" + object.PARAM[i].ParamValue + "'"
-		case global.Apply_Param_JZ:
-			param1str += "emergency = '" + object.PARAM[i].ParamValue + "'"
 		default:
 			param1str += "1 = 1"
 		}
@@ -529,38 +564,9 @@ func ByZLHisMysqlView(object global.ApplyFormInfoData) (count int, data []global
 		sql += param1str
 		sql += ")"
 	}
-	// 参数就诊类型
-	var parampatType string
-	for i := 0; i < len(patType); i++ {
-		if i > 0 {
-			parampatType += ","
-		}
-		parampatType += "'" + patType[i] + "'"
-	}
-	if len(patType) > 0 {
-		sql += " and("
-		sql += "patient_type_name in ("
-		sql += parampatType
-		sql += "))"
 
-	}
-
-	// 参数检查类型
-	var paramstuType string
-	for i := 0; i < len(stuType); i++ {
-		if i > 0 {
-			paramstuType += ","
-		}
-		paramstuType += "'" + stuType[i] + "'"
-	}
-	if len(stuType) > 0 {
-		sql += " and("
-		sql += "modality_code in ("
-		sql += paramstuType
-		sql += "))"
-	}
-
-	// 参数2
+	// 参数时间
+	param2len := len(object.PARAM2)
 	var param2str string
 	for i := 0; i < param2len; i++ {
 		if i > 0 {
@@ -578,13 +584,12 @@ func ByZLHisMysqlView(object global.ApplyFormInfoData) (count int, data []global
 		sql += ")"
 	}
 
-	// 排序
+	// 参数排序
 	if 1 == object.SortType {
 		sql += " order by request_time asc"
 	} else {
 		sql += " order by request_time desc"
 	}
-
 	// 单独返回条件数据总数(不仅仅是分页后的数据)
 	count = model.GetDataCount(sql)
 	pagenum := (object.StartSize - 1) * object.EndSize
@@ -595,5 +600,6 @@ func ByZLHisMysqlView(object global.ApplyFormInfoData) (count int, data []global
 	}
 	global.Logger.Debug("执行的sql语句是: ", sql)
 	data = model.GetZLHisViewApply(sql)
+
 	return
 }

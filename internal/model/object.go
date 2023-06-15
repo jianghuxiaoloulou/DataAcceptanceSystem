@@ -10,9 +10,16 @@ func GetReportInfo(reguidenc string) (global.ReportKeyData, error) {
 	r.audit_time,r.report_time,r.register_uid_enc FROM report r 
 	LEFT JOIN register_info fi on fi.uid_enc = r.uid_enc
 	WHERE fi.register_uid_enc = ?`
-	row := global.ReadDBEngine.QueryRow(sql, reguidenc)
+	var err error
+	err = global.PacsDBEngine.Ping()
+	if err != nil {
+		global.Logger.Error(err.Error())
+		global.PacsDBEngine, _ = NewPacsDBEngine(global.DatabaseSetting)
+	}
+
+	row := global.PacsDBEngine.QueryRow(sql, reguidenc)
 	repdata := global.ReportKeyData{}
-	err := row.Scan(&repdata.ReportId, &repdata.Uidenc, &repdata.SmsStatus, &repdata.PatientID, &repdata.ReportStatus, &repdata.Finding, &repdata.Conclusion, &repdata.CheckDoctorId,
+	err = row.Scan(&repdata.ReportId, &repdata.Uidenc, &repdata.SmsStatus, &repdata.PatientID, &repdata.ReportStatus, &repdata.Finding, &repdata.Conclusion, &repdata.CheckDoctorId,
 		&repdata.CheckDoctor, &repdata.ReportDoctor, &repdata.ReportDoctorID, &repdata.AuditDoctor, &repdata.AuditDoctorID, &repdata.StudyTime, &repdata.InitTime,
 		&repdata.AuditTime, &repdata.ReportTime, &repdata.RegisterUidEnc)
 	if err != nil {

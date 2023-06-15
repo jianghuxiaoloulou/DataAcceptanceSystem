@@ -73,8 +73,12 @@ http://127.0.0.1:8000/swagger/index.html
 # git commit -m "first commit"
 # git push -u origin master
 
+# 代码编译命令
+go build -ldflags="-H windowsgui" -o .\DataAcceptanceSystem\DataAcceptanceSystem.exe .\main.go
+
 
 # 修改记录
+* 2023/06/15 修改数据库配置，拆分门诊/体检/住院数据
 * 2023/06/13 修改初始化函数，增加初始化文件包
 * 2023/06/08 修改分页逻辑
 * 2023/06/07 增加排序，增加申请单字段

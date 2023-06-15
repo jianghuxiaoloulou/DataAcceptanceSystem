@@ -83,12 +83,12 @@ type ApplyInfo struct {
 func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 	global.Logger.Debug("开始查询视图数据.....")
 	var err error
-	err = global.OracleDBEngine.Ping()
+	err = global.MZApplyDBEngine.Ping()
 	if err != nil {
 		global.Logger.Error(err.Error())
-		global.OracleDBEngine, _ = NewOracleDBEngine(global.DatabaseSetting)
+		global.MZApplyDBEngine, _ = NewMZApplyDBEngine(global.DatabaseSetting)
 	}
-	rows, err := global.OracleDBEngine.Query(sql)
+	rows, err := global.MZApplyDBEngine.Query(sql)
 	if err != nil {
 		global.Logger.Error(err)
 		return
@@ -131,14 +131,17 @@ func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 		} else if key.Pat_Info.Pat_age_unit.String == "秒" {
 			ageUnit = 7
 		}
-
+		var birthday string
+		if key.Pat_Info.Pat_brsdate.String != "" && len(key.Pat_Info.Pat_brsdate.String) > 10 {
+			birthday = key.Pat_Info.Pat_brsdate.String[0:10]
+		}
 		patinfo := global.PatientInfo{
 			Pat_name:     key.Pat_Info.Pat_name.String,
 			Pat_sex_code: key.Pat_Info.Pat_sex_code.String,
 			Pat_sex:      sex,
 			Pat_age:      int(key.Pat_Info.Pat_age.Int16),
 			Pat_age_unit: ageUnit,
-			Pat_brsdate:  key.Pat_Info.Pat_brsdate.String[0:10],
+			Pat_brsdate:  birthday,
 			Pat_tel:      key.Pat_Info.Pat_tel.String,
 			Pat_idno:     key.Pat_Info.Pat_idno.String,
 			Pat_addr:     key.Pat_Info.Pat_addr.String,
@@ -289,12 +292,13 @@ func GetZLHisViewApply(sql string) (data []global.ApplyFormResultData) {
 func GetDataCount(sql string) (count int) {
 	global.Logger.Debug("开始查询条件数据总数.....")
 	var err error
-	err = global.OracleDBEngine.Ping()
+	err = global.MZApplyDBEngine.Ping()
 	if err != nil {
 		global.Logger.Error(err.Error())
-		global.OracleDBEngine, _ = NewOracleDBEngine(global.DatabaseSetting)
+		global.MZApplyDBEngine, _ = NewMZApplyDBEngine(global.DatabaseSetting)
 	}
-	rows, err := global.OracleDBEngine.Query(sql)
+
+	rows, err := global.MZApplyDBEngine.Query(sql)
 	if err != nil {
 		global.Logger.Error(err)
 		return

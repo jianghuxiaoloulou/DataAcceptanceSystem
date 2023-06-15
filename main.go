@@ -16,7 +16,7 @@ import (
 // @description PACS集成平台
 // @termsOfService https://github.com/jianghuxiaoloulou/DataAcceptanceSystem.git
 func main() {
-	initialize.ReadSetup()
+	initialize.InitSetup()
 	global.Logger.Info("***开始运行PACS集成平台服务***")
 	global.ApplyFormStatusDataChan = make(chan global.ApplyFormStatusData, global.GeneralSetting.MaxThreads)
 	// 注册工作池，传入任务

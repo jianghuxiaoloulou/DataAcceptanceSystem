@@ -13,25 +13,6 @@ General:
   MaxThreads: 100
   MaxTasks: 100
 Database:
-  # 树兰安吉医院：espacs:Espacs@2020@tcp(172.16.0.7:3306)/espacs?charset=utf8
-  # 杭州树兰医院：espacs:espacs@2017@tcp(10.20.32.212:31967)/espacs?charset=utf8
-  DBConn: espacs:espacs@2017@tcp(10.20.32.212:31967)/espacs?charset=utf8
-  # DBConn: hrp:asdf@123@tcp(10.110.20.133:30664)/espacs?charset=utf8  
-  DBType: mysql
-  MaxIdleConns: 100
-  MaxOpenConns: 100
-  MaxLifetime: 60
-  # HIS 数据库类型 1:mysql 2:oracle
-  HISSqlType: 1
-  # mysql数据库配置
-  OracleDBType: mysql
-  OracleDBConn: sunzegang:sunzegang@2023@tcp(172.16.255.26:35917)/ms_qypacs?charset=utf8
-  OracleDBView: V_PACS_HZ
-  # HIS数据库连接oracle数据库配置
-  #OracleDBType: godror
-  #OracleDBConn: user="pacs_hz" password="yZLoGA0v" connectString="192.168.10.2:1521/orcl"
-  #OracleDBView: V_PACS_HZ
-
   # ********************************PACS集成平台数据库配置模块*****************************
   # 数据库公共模块
   DBMaxIdleConns: 100
@@ -40,6 +21,13 @@ Database:
   # ******PACS数据库连接信息******
   PacsDBType: mysql
   PacsDBConn: espacs:espacs@2017@tcp(10.20.32.212:31967)/espacs?charset=utf8
+
+  # 申请单
+  # HIS 数据库类型 1:mysql 2:oracle
+  HISSqlType: 1
+  # HIS数据库连接oracle数据库配置
+  #OracleDBType: godror
+  #OracleDBConn: user="pacs_hz" password="yZLoGA0v" connectString="192.168.10.2:1521/orcl"
   # ******门诊申请单数据库配置******
   MZApplyDBType: mysql
   MZApplyDBConn: sunzegang:sunzegang@2023@tcp(172.16.255.26:35917)/ms_qypacs?charset=utf8

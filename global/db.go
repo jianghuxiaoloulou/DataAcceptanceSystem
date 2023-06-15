@@ -11,7 +11,8 @@ const (
 )
 
 var (
-	ReadDBEngine   *sql.DB
-	WriteDBEngine  *sql.DB
-	OracleDBEngine *sql.DB
+	PacsDBEngine    *sql.DB // PACS数据库
+	MZApplyDBEngine *sql.DB // 门诊申请单数据库
+	ZYApplyDBEngine *sql.DB // 住院申请单数据库
+	TJApplyDBEngine *sql.DB // 住院申请单数据库
 )

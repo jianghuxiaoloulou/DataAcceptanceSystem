@@ -20,21 +20,24 @@ type GeneralSettingS struct {
 }
 
 type DatabaseSettingS struct {
-	DBConn       string
-	DBType       string
-	MaxIdleConns int
-	MaxOpenConns int
-	MaxLifetime  int
-	HISSqlType   int
-	OracleDBType string
-	OracleDBConn string
-	OracleDBView string
+	// 数据库模块修改后的参数配置
+	DBMaxIdleConns int
+	DBMaxOpenConns int
+	DBMaxLifetime  int
+	PacsDBType     string
+	PacsDBConn     string
+	HISSqlType     int
+	MZApplyDBType  string
+	MZApplyDBConn  string
+	ZYApplyDBType  string
+	ZYApplyDBConn  string
+	TJApplyDBType  string
+	TJApplyDBConn  string
 }
 
 type ObjectSettingS struct {
 	InterfaceSystemType int
 	HISURL              string
-	Shenqingdan         []string
 }
 
 func (s *Setting) ReadSection(k string, v interface{}) error {

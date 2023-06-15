@@ -13,6 +13,10 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+func InitSetup() {
+	ReadSetup()
+}
+
 func SetupSetting() error {
 	setting, err := setting.NewSetting()
 	if err != nil {
@@ -52,27 +56,36 @@ func SetupLogger() error {
 	return nil
 }
 
-func SetupReadDBEngine() error {
+func SetupPacsDBEngine() error {
 	var err error
-	global.ReadDBEngine, err = model.NewDBEngine(global.DatabaseSetting)
+	global.PacsDBEngine, err = model.NewPacsDBEngine(global.DatabaseSetting)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func SetupWriteDBEngine() error {
+func SetupMZApplyDBEngine() error {
 	var err error
-	global.WriteDBEngine, err = model.NewDBEngine(global.DatabaseSetting)
+	global.MZApplyDBEngine, err = model.NewMZApplyDBEngine(global.DatabaseSetting)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func SetupOracleDBEngine() error {
+func SetupZYApplyDBEngine() error {
 	var err error
-	global.OracleDBEngine, err = model.NewOracleDBEngine(global.DatabaseSetting)
+	global.ZYApplyDBEngine, err = model.NewZYApplyDBEngine(global.DatabaseSetting)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetupTJApplyDBEngine() error {
+	var err error
+	global.TJApplyDBEngine, err = model.NewTJApplyDBEngine(global.DatabaseSetting)
 	if err != nil {
 		return err
 	}
@@ -88,15 +101,19 @@ func ReadSetup() {
 	if err != nil {
 		log.Fatalf("init.setupLogger err: %v", err)
 	}
-	err = SetupReadDBEngine()
+	err = SetupPacsDBEngine()
 	if err != nil {
 		log.Fatalf("init.setupReadDBEngine err: %v", err)
 	}
-	err = SetupWriteDBEngine()
+	err = SetupMZApplyDBEngine()
 	if err != nil {
 		log.Fatalf("init.setupWriteDBEngine err: %v", err)
 	}
-	err = SetupOracleDBEngine()
+	err = SetupZYApplyDBEngine()
+	if err != nil {
+		log.Fatalf("init.setupOracleDBEngine err: %v", err)
+	}
+	err = SetupTJApplyDBEngine()
 	if err != nil {
 		log.Fatalf("init.setupOracleDBEngine err: %v", err)
 	}

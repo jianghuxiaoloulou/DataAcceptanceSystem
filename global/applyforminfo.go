@@ -5,7 +5,6 @@ const (
 	Pat_Type_MZ int = 1 // 门诊
 	Pat_Type_ZY int = 2 // 住院
 	Pat_Type_TJ int = 3 // 体检
-	Pat_Type_OT int = 9 // 其它
 )
 
 // 检查类型
@@ -20,7 +19,14 @@ const (
 	Study_Type_PA   int = 8  // PA
 	Study_Type_NM   int = 9  // NM
 	Study_Type_PET  int = 10 // PET
+	Study_Type_ALL  int = 98 // ALL
 	Study_Type_OT   int = 99 // OT
+)
+
+// 急诊类型
+const (
+	Mergency_Type_True  int = 1 //急诊数据
+	Mergency_Type_False int = 0 //非急诊数据
 )
 
 // 申请单请求参数类型
@@ -35,7 +41,6 @@ const (
 	Apply_Param_TJSQDH int = 8  // 体检申请单号
 	Apply_Param_SFZH   int = 9  // 身份证号
 	Apply_Param_XM     int = 10 // 患者姓名
-	Apply_Param_JZ     int = 11 //急诊
 )
 
 // 申请单信息请求
@@ -44,6 +49,7 @@ type ApplyFormInfoData struct {
 	Time        string   `json:"time" binding:"required"`
 	PatientType []int    `json:"pat_type"`
 	StudyType   []int    `json:"study_type"`
+	MergencySta int      `json:"mergency_status"`
 	StartSize   int      `json:"page_num"`
 	EndSize     int      `json:"page_size"`
 	SortType    int      `json:"sort_type"`
