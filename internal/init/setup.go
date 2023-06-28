@@ -15,6 +15,7 @@ import (
 
 func InitSetup() {
 	ReadSetup()
+	ReadDBDictData()
 }
 
 func SetupSetting() error {
@@ -56,36 +57,9 @@ func SetupLogger() error {
 	return nil
 }
 
-func SetupPacsDBEngine() error {
+func SetupDBEngine() error {
 	var err error
-	global.PacsDBEngine, err = model.NewPacsDBEngine(global.DatabaseSetting)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func SetupMZApplyDBEngine() error {
-	var err error
-	global.MZApplyDBEngine, err = model.NewMZApplyDBEngine(global.DatabaseSetting)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func SetupZYApplyDBEngine() error {
-	var err error
-	global.ZYApplyDBEngine, err = model.NewZYApplyDBEngine(global.DatabaseSetting)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func SetupTJApplyDBEngine() error {
-	var err error
-	global.TJApplyDBEngine, err = model.NewTJApplyDBEngine(global.DatabaseSetting)
+	global.DBEngine, err = model.NewDBEngine(global.DatabaseSetting)
 	if err != nil {
 		return err
 	}
@@ -101,20 +75,13 @@ func ReadSetup() {
 	if err != nil {
 		log.Fatalf("init.setupLogger err: %v", err)
 	}
-	err = SetupPacsDBEngine()
+	err = SetupDBEngine()
 	if err != nil {
-		log.Fatalf("init.setupReadDBEngine err: %v", err)
+		log.Fatalf("init.setupDBEngine err: %v", err)
 	}
-	err = SetupMZApplyDBEngine()
-	if err != nil {
-		log.Fatalf("init.setupWriteDBEngine err: %v", err)
-	}
-	err = SetupZYApplyDBEngine()
-	if err != nil {
-		log.Fatalf("init.setupOracleDBEngine err: %v", err)
-	}
-	err = SetupTJApplyDBEngine()
-	if err != nil {
-		log.Fatalf("init.setupOracleDBEngine err: %v", err)
-	}
+}
+
+// 获取字典数据，保存为全局数据
+func ReadDBDictData() {
+	model.GetDictData()
 }

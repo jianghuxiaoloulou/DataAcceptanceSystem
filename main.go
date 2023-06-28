@@ -34,7 +34,6 @@ func main() {
 			}
 		}
 	}()
-	// TestData()
 	web()
 }
 
@@ -48,9 +47,9 @@ func (d *Dosomething) Do() {
 	switch d.key.Bizno {
 	case global.Server_ApplyStatus:
 		// 申请单状态处理
+		global.Logger.Debug("处理申请单状态")
 		object.ApplyFormStatusNotity(d.key)
-	case global.Server_ApplyInfo:
-		// obj.DownObject()
+	default:
 	}
 }
 

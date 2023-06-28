@@ -18,28 +18,9 @@ Database:
   DBMaxIdleConns: 100
   DBMaxOpenConns: 100
   DBMaxLifetime: 60
-  # ******PACS数据库连接信息******
-  PacsDBType: mysql
-  PacsDBConn: espacs:espacs@2017@tcp(10.20.32.212:31967)/espacs?charset=utf8
-
-  # 申请单
-  # HIS 数据库类型 1:mysql 2:oracle
-  HISSqlType: 1
-  # HIS数据库连接oracle数据库配置
-  #OracleDBType: godror
-  #OracleDBConn: user="pacs_hz" password="yZLoGA0v" connectString="192.168.10.2:1521/orcl"
-  # ******门诊申请单数据库配置******
-  MZApplyDBType: mysql
-  MZApplyDBConn: sunzegang:sunzegang@2023@tcp(172.16.255.26:35917)/ms_qypacs?charset=utf8
-  # ******住院申请单数据库配置******
-  ZYApplyDBType: mysql
-  ZYApplyDBConn: sunzegang:sunzegang@2023@tcp(172.16.255.26:35917)/ms_qypacs?charset=utf8
-  # ******体检申请单数据库配置******
-  TJApplyDBType: mysql
-  TJApplyDBConn: sunzegang:sunzegang@2023@tcp(172.16.255.26:35917)/ms_qypacs?charset=utf8
-
+  # ******PACS集成平台数据库连接信息******
+  DBType: mysql
+  DBConn: espacs:Wowjoy@2018@tcp(172.16.255.26:30117)/ms_pacs_interface?charset=utf8
 Object:
   # 第三方系统类型: 根据医院编号字典表对应（1.树兰医院，2.酉阳医院）
   InterfaceSystemType: 2
-  # 中联HIS接口
-  HISURL: http://192.168.10.167:8099/zlhis-recv/pacs

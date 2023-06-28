@@ -1,27 +1,6 @@
 package global
 
-// 就诊类型
-const (
-	Pat_Type_MZ int = 1 // 门诊
-	Pat_Type_ZY int = 2 // 住院
-	Pat_Type_TJ int = 3 // 体检
-)
-
-// 检查类型
-const (
-	Study_Type_XRay int = 1  // X-Ray
-	Study_Type_DR   int = 2  // DR
-	Study_Type_CT   int = 3  // CT
-	Study_Type_MR   int = 4  // MR
-	Study_Type_DSA  int = 5  // DSA
-	Study_Type_US   int = 6  // US
-	Study_Type_ES   int = 7  // ES
-	Study_Type_PA   int = 8  // PA
-	Study_Type_NM   int = 9  // NM
-	Study_Type_PET  int = 10 // PET
-	Study_Type_ALL  int = 98 // ALL
-	Study_Type_OT   int = 99 // OT
-)
+// 申请单信息变量
 
 // 急诊类型
 const (
@@ -47,11 +26,12 @@ const (
 type ApplyFormInfoData struct {
 	Bizno       string   `json:"bizno" binding:"required"`
 	Time        string   `json:"time" binding:"required"`
+	HospitalID  string   `json:"hospital_id" binding:"required"`
 	PatientType []int    `json:"pat_type"`
 	StudyType   []int    `json:"study_type"`
 	MergencySta int      `json:"mergency_status"`
-	StartSize   int      `json:"page_num"`
-	EndSize     int      `json:"page_size"`
+	PageNum     int      `json:"page_num"`
+	PageSize    int      `json:"page_size"`
 	SortType    int      `json:"sort_type"`
 	SortValue   int      `json:"sort_value"`
 	PARAM       []Param  `json:"req_info"`
@@ -151,9 +131,10 @@ type ApplyInfo struct {
 // 返回结果
 // 申请单状态返回
 type ApplyFormInfoResult struct {
-	Bizno     string                `json:"bizno"`
-	Time      string                `json:"time"`
-	PARAM     AckInfo               `json:"ack_info"`
-	DataCount int                   `json:"data_count"`
-	DATA      []ApplyFormResultData `json:"data"`
+	Bizno      string                `json:"bizno"`
+	Time       string                `json:"time"`
+	HospitalID string                `json:"hospital_id"`
+	Info       AckInfo               `json:"ack_info"`
+	DataCount  int                   `json:"data_count"`
+	DATA       []ApplyFormResultData `json:"data"`
 }

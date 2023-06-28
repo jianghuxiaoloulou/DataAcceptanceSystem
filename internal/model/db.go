@@ -1,15 +1,17 @@
 package model
 
 import (
+	"WowjoyProject/DataAcceptanceSystem/global"
 	"WowjoyProject/DataAcceptanceSystem/pkg/setting"
 	"database/sql"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"time"
+
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-// Pacs
-func NewPacsDBEngine(databaseSetting *setting.DatabaseSettingS) (*sql.DB, error) {
-	db, err := sql.Open(databaseSetting.PacsDBType, databaseSetting.PacsDBConn)
+// PACS集成平台数据库操作
+func NewDBEngine(databaseSetting *setting.DatabaseSettingS) (*sql.DB, error) {
+	db, err := sql.Open(databaseSetting.DBType, databaseSetting.DBConn)
 	if err != nil {
 		return nil, err
 	}
@@ -21,44 +23,16 @@ func NewPacsDBEngine(databaseSetting *setting.DatabaseSettingS) (*sql.DB, error)
 	return db, nil
 }
 
-//门诊
-func NewMZApplyDBEngine(databaseSetting *setting.DatabaseSettingS) (*sql.DB, error) {
-	db, err := sql.Open(databaseSetting.MZApplyDBType, databaseSetting.MZApplyDBConn)
+// 创建临时数据库连接
+func NewTempDBEngine(dbType, dbConn string) (*sql.DB, error) {
+	db, err := sql.Open(dbType, dbConn)
 	if err != nil {
 		return nil, err
 	}
 	// 数据库最大连接数
-	db.SetConnMaxLifetime(time.Duration(databaseSetting.DBMaxLifetime) * time.Minute)
-	db.SetMaxOpenConns(databaseSetting.DBMaxOpenConns)
-	db.SetMaxIdleConns(databaseSetting.DBMaxIdleConns)
-
-	return db, nil
-}
-
-// 住院
-func NewZYApplyDBEngine(databaseSetting *setting.DatabaseSettingS) (*sql.DB, error) {
-	db, err := sql.Open(databaseSetting.ZYApplyDBType, databaseSetting.ZYApplyDBConn)
-	if err != nil {
-		return nil, err
-	}
-	// 数据库最大连接数
-	db.SetConnMaxLifetime(time.Duration(databaseSetting.DBMaxLifetime) * time.Minute)
-	db.SetMaxOpenConns(databaseSetting.DBMaxOpenConns)
-	db.SetMaxIdleConns(databaseSetting.DBMaxIdleConns)
-
-	return db, nil
-}
-
-// 体检
-func NewTJApplyDBEngine(databaseSetting *setting.DatabaseSettingS) (*sql.DB, error) {
-	db, err := sql.Open(databaseSetting.TJApplyDBType, databaseSetting.TJApplyDBConn)
-	if err != nil {
-		return nil, err
-	}
-	// 数据库最大连接数
-	db.SetConnMaxLifetime(time.Duration(databaseSetting.DBMaxLifetime) * time.Minute)
-	db.SetMaxOpenConns(databaseSetting.DBMaxOpenConns)
-	db.SetMaxIdleConns(databaseSetting.DBMaxIdleConns)
+	db.SetConnMaxLifetime(time.Duration(global.DatabaseSetting.DBMaxLifetime) * time.Minute)
+	db.SetMaxOpenConns(global.DatabaseSetting.DBMaxOpenConns)
+	db.SetMaxIdleConns(global.DatabaseSetting.DBMaxIdleConns)
 
 	return db, nil
 }

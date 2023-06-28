@@ -179,12 +179,13 @@ func GetMZViewApply(param global.Param, param2 []global.Param2) (count int, data
 
 	global.Logger.Debug("执行的sql语句是: ", sql)
 
-	err = global.MZApplyDBEngine.Ping()
+	err = global.DBEngine.Ping()
 	if err != nil {
 		global.Logger.Error(err.Error())
-		global.MZApplyDBEngine, _ = NewMZApplyDBEngine(global.DatabaseSetting)
+		global.DBEngine.Close()
+		global.DBEngine, _ = NewDBEngine(global.DatabaseSetting)
 	}
-	rows, err := global.MZApplyDBEngine.Query(sql)
+	rows, err := global.DBEngine.Query(sql)
 	if err != nil {
 		global.Logger.Error(err)
 		return
@@ -365,12 +366,12 @@ func GetZYViewApply(param global.Param, param2 []global.Param2) (count int, data
 
 	global.Logger.Debug("执行的sql语句是: ", sql)
 
-	err = global.ZYApplyDBEngine.Ping()
+	err = global.DBEngine.Ping()
 	if err != nil {
 		global.Logger.Error(err.Error())
-		global.ZYApplyDBEngine, _ = NewZYApplyDBEngine(global.DatabaseSetting)
+		global.DBEngine, _ = NewDBEngine(global.DatabaseSetting)
 	}
-	rows, err := global.ZYApplyDBEngine.Query(sql)
+	rows, err := global.DBEngine.Query(sql)
 	if err != nil {
 		global.Logger.Error(err)
 		return
@@ -553,12 +554,12 @@ func GetTJViewApply(param global.Param, param2 []global.Param2) (count int, data
 
 	global.Logger.Debug("执行的sql语句是: ", sql)
 
-	err = global.TJApplyDBEngine.Ping()
+	err = global.DBEngine.Ping()
 	if err != nil {
 		global.Logger.Error(err.Error())
-		global.TJApplyDBEngine, _ = NewTJApplyDBEngine(global.DatabaseSetting)
+		global.DBEngine, _ = NewDBEngine(global.DatabaseSetting)
 	}
-	rows, err := global.TJApplyDBEngine.Query(sql, param.ParamValue)
+	rows, err := global.DBEngine.Query(sql, param.ParamValue)
 	if err != nil {
 		global.Logger.Error(err)
 		return

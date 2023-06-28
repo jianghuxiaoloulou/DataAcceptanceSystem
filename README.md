@@ -78,6 +78,7 @@ go build -ldflags="-H windowsgui" -o .\DataAcceptanceSystem\DataAcceptanceSystem
 
 
 # 修改记录
+* 2023/06/15 重构PACS集成平台设计（修改对接区域PACS，对接多家HIS，增加医院配置，HIS配置，功能模块配置，字典表）
 * 2023/06/15 修改数据库配置，拆分门诊/体检/住院数据
 * 2023/06/13 修改初始化函数，增加初始化文件包
 * 2023/06/08 修改分页逻辑

@@ -24,20 +24,12 @@ type DatabaseSettingS struct {
 	DBMaxIdleConns int
 	DBMaxOpenConns int
 	DBMaxLifetime  int
-	PacsDBType     string
-	PacsDBConn     string
-	HISSqlType     int
-	MZApplyDBType  string
-	MZApplyDBConn  string
-	ZYApplyDBType  string
-	ZYApplyDBConn  string
-	TJApplyDBType  string
-	TJApplyDBConn  string
+	DBType         string
+	DBConn         string
 }
 
 type ObjectSettingS struct {
 	InterfaceSystemType int
-	HISURL              string
 }
 
 func (s *Setting) ReadSection(k string, v interface{}) error {
