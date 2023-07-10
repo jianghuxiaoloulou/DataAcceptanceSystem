@@ -124,16 +124,15 @@ type TJApplyInfoOracle struct {
 
 // 体检申请单 VIEW_TJPACSJK（sqlserver版本）
 type TJApplyInfoSqlServer struct {
-	SQDH        sql.NullString // 体检号
-	TJBH        sql.NullString // 检查编号
-	XM          sql.NullString // 姓名
-	XB          sql.NullString // 性别（M=男，F=女）
-	XMBH        sql.NullString // 组合项目编号(多个项目逗号隔开，英文逗号)
-	XMMC        sql.NullString // 组合项目名称(多个项目逗号隔开，英文逗号)
-	studyclass0 sql.NullString // 检查类型(CT/US/MR/DR/MR/ES/MG/RF.....)
-	DJRQ        sql.NullTime   // 开单日期
-	CSNY        sql.NullTime   // 出生日期
-	DABH        sql.NullString // 病历号 可空
+	SQDH sql.NullString // 体检号
+	TJBH sql.NullString // 检查编号
+	XM   sql.NullString // 姓名
+	XB   sql.NullString // 性别（M=男，F=女）
+	XMBH sql.NullString // 组合项目编号(多个项目逗号隔开，英文逗号)
+	XMMC sql.NullString // 组合项目名称(多个项目逗号隔开，英文逗号)
+	DJRQ sql.NullTime   // 开单日期
+	CSNY sql.NullTime   // 出生日期
+	DABH sql.NullString // 病历号 可空
 }
 
 // 获取门诊申请单数据

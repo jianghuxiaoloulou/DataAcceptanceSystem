@@ -30,12 +30,7 @@ func GetZLHisViewApply(db *sql.DB, sql string) (data []global.ApplyFormResultDat
 		// 获取性别编码
 		var sexCode int
 		if key.SexName.String != "" {
-			for _, dict := range global.DictDatas {
-				if key.SexName.String == dict.Name {
-					sexCode = dict.Code
-					break
-				}
-			}
+			sexCode = GetDictCode(key.SexName.String)
 		} else {
 			sexCode = global.OtherCode
 		}
@@ -43,12 +38,7 @@ func GetZLHisViewApply(db *sql.DB, sql string) (data []global.ApplyFormResultDat
 		// 获取年龄单位编码
 		var ageUnitCode int
 		if key.AgeUnit.String != "" {
-			for _, dict := range global.DictDatas {
-				if key.AgeUnit.String == dict.Name {
-					ageUnitCode = dict.Code
-					break
-				}
-			}
+			ageUnitCode = GetDictCode(key.AgeUnit.String)
 		} else {
 			ageUnitCode = global.OtherCode
 		}
@@ -68,12 +58,7 @@ func GetZLHisViewApply(db *sql.DB, sql string) (data []global.ApplyFormResultDat
 		// 获取就诊类型编码
 		var patCode int
 		if key.PatientTypeName.String != "" {
-			for _, dict := range global.DictDatas {
-				if key.PatientTypeName.String == dict.Name {
-					patCode = dict.Code
-					break
-				}
-			}
+			patCode = GetDictCode(key.PatientTypeName.String)
 		} else {
 			patCode = global.OtherCode
 		}
@@ -81,12 +66,7 @@ func GetZLHisViewApply(db *sql.DB, sql string) (data []global.ApplyFormResultDat
 		// 获取检查类型编码
 		var studyCode int
 		if key.ModalityCode.String != "" {
-			for _, dict := range global.DictDatas {
-				if key.ModalityCode.String == dict.Name {
-					studyCode = dict.Code
-					break
-				}
-			}
+			studyCode = GetDictCode(key.ModalityCode.String)
 		} else {
 			studyCode = global.OtherCode
 		}

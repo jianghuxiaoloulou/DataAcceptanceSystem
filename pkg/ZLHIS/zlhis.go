@@ -310,14 +310,7 @@ func ByMysqlGetApplyData(his global.HisConfig, object global.ApplyFormInfoData) 
 	var parampatType string
 	for index, value := range object.PatientType {
 		// 通过字典获取数据
-		var name string
-		for _, dict := range global.DictDatas {
-			if value == dict.Code {
-				name = dict.Name
-				break
-			}
-		}
-		// Loop:
+		name := model.GetDictName(value)
 		global.Logger.Debug("获取的患者就诊类型名为：", name)
 		if index > 0 {
 			parampatType += ","
@@ -336,13 +329,7 @@ func ByMysqlGetApplyData(his global.HisConfig, object global.ApplyFormInfoData) 
 	var paramstuType string
 	for index, value := range object.StudyType {
 		// 通过字典获取数据
-		var name string
-		for _, dict := range global.DictDatas {
-			if value == dict.Code {
-				name = dict.Name
-				break
-			}
-		}
+		name := model.GetDictName(value)
 		global.Logger.Debug("获取的检查诊类型名为：", name)
 		if index > 0 {
 			paramstuType += ","
@@ -422,7 +409,7 @@ func ByMysqlGetApplyData(his global.HisConfig, object global.ApplyFormInfoData) 
 		sql += ")"
 	}
 
-	// 参数排序
+	// 参数排序 0-降序 1-升序；默认降序
 	if 1 == object.SortType {
 		sql += " order by request_time asc"
 	} else {
@@ -468,13 +455,7 @@ func ByOracleGetApplyData(his global.HisConfig, object global.ApplyFormInfoData)
 	var parampatType string
 	for index, value := range object.PatientType {
 		// 通过字典获取数据
-		var name string
-		for _, dict := range global.DictDatas {
-			if value == dict.Code {
-				name = dict.Name
-				break
-			}
-		}
+		name := model.GetDictName(value)
 		global.Logger.Debug("获取的患者就诊类型名为：", name)
 		if index > 0 {
 			parampatType += ","
@@ -493,13 +474,7 @@ func ByOracleGetApplyData(his global.HisConfig, object global.ApplyFormInfoData)
 	var paramstuType string
 	for index, value := range object.StudyType {
 		// 通过字典获取数据
-		var name string
-		for _, dict := range global.DictDatas {
-			if value == dict.Code {
-				name = dict.Name
-				break
-			}
-		}
+		name := model.GetDictName(value)
 		global.Logger.Debug("获取的检查诊类型名为：", name)
 		if index > 0 {
 			paramstuType += ","

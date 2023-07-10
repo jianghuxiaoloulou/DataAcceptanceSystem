@@ -4,48 +4,6 @@ package model
 
 import "WowjoyProject/DataAcceptanceSystem/global"
 
-// 获取字典NAME
-// func GetDictName(code int) (string, error) {
-// 	global.Logger.Info("获取字典NAME通过字典编码: ", code)
-// 	sql := `SELECT dict_name FROM sys_dict_type WHERE dict_code = ?`
-// 	var err error
-// 	err = global.DBEngine.Ping()
-// 	if err != nil {
-// 		global.Logger.Error(err.Error())
-// 		global.DBEngine.Close()
-// 		global.DBEngine, _ = NewDBEngine(global.DatabaseSetting)
-// 	}
-// 	var name string
-// 	row := global.DBEngine.QueryRow(sql, code)
-// 	err = row.Scan(&name)
-// 	if err != nil {
-// 		global.Logger.Error(err)
-// 		return name, err
-// 	}
-// 	return name, nil
-// }
-
-// // 获取字典CODE
-// func GetDictCode(name string) (int, error) {
-// 	global.Logger.Info("获取字典CODE通过字典名称: ", name)
-// 	sql := `SELECT dict_code FROM sys_dict_type WHERE dict_name = ?`
-// 	var err error
-// 	err = global.DBEngine.Ping()
-// 	if err != nil {
-// 		global.Logger.Error(err.Error())
-// 		global.DBEngine.Close()
-// 		global.DBEngine, _ = NewDBEngine(global.DatabaseSetting)
-// 	}
-// 	var code int
-// 	row := global.DBEngine.QueryRow(sql, name)
-// 	err = row.Scan(&code)
-// 	if err != nil {
-// 		global.Logger.Error(err)
-// 		return code, err
-// 	}
-// 	return code, nil
-// }
-
 func GetDictData() {
 	global.Logger.Info("获取字典数据")
 	sql := `SELECT dict_code,dict_name FROM sys_dict_type`
@@ -71,4 +29,28 @@ func GetDictData() {
 		}
 		global.DictDatas = append(global.DictDatas, data)
 	}
+}
+
+// 获取字典NAME
+func GetDictName(code int) (name string) {
+	global.Logger.Info("获取字典NAME通过字典编码: ", code)
+	for _, dict := range global.DictDatas {
+		if code == dict.Code {
+			name = dict.Name
+			break
+		}
+	}
+	return
+}
+
+// 获取字典CODE
+func GetDictCode(name string) (code int) {
+	global.Logger.Info("获取字典CODE通过字典名称: ", name)
+	for _, dict := range global.DictDatas {
+		if name == dict.Name {
+			code = dict.Code
+			break
+		}
+	}
+	return
 }
