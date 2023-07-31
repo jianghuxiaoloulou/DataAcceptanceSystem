@@ -10,6 +10,7 @@ const (
 	Apply_Status_Drafted    int = 104 // 已起草
 	Apply_Status_WaitAudit  int = 105 // 待审核
 	Apply_Status_Audited    int = 106 // 已审核
+	Apply_Status_Diagnose   int = 107 // 远程诊断
 	Apply_Status_Charging   int = 199 // 主动计费
 )
 
@@ -19,7 +20,7 @@ const (
 	Apply_Func_B string = "B" // 中联HIS申请单取消报到回写
 	Apply_Func_C string = "C" // 中联HIS申请单取消报到回写
 	Apply_Func_D string = "D" // 中联HIS申请单取消报到回写
-	Apply_Func_E string = "E" // 中联HIS申请单取消报到回写
+	Apply_Func_E string = "E" // 申请远程诊断发送申请单到飞利浦PACS
 )
 
 // 申请单状态请求
@@ -35,6 +36,15 @@ type Param struct {
 	ParamValue string `json:"param_value"`
 }
 
+// 第三方PACS申请单和影像数据上传
+type ApplyDicomData struct {
+	Bizno      string `json:"bizno" binding:"required"`
+	Time       string `json:"time" binding:"required"`
+	HospitalID string `json:"hospital_id" binding:"required"`
+	ApplyID    string `json:"apply_id"`
+	PARAM      Param2 `json:"req_info"`
+}
+
 // 申请单状态返回
 type ApplyFormStatusResult struct {
 	Bizno      string  `json:"bizno"`
@@ -42,7 +52,3 @@ type ApplyFormStatusResult struct {
 	HospitalID string  `json:"hospital_id"`
 	Info       AckInfo `json:"ack_info"`
 }
-
-var (
-	ApplyFormStatusDataChan chan ApplyFormStatusData
-)

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/mattn/go-adodb"
 )
 
 // PACS集成平台数据库操作
@@ -33,6 +34,5 @@ func NewTempDBEngine(dbType, dbConn string) (*sql.DB, error) {
 	db.SetConnMaxLifetime(time.Duration(global.DatabaseSetting.DBMaxLifetime) * time.Minute)
 	db.SetMaxOpenConns(global.DatabaseSetting.DBMaxOpenConns)
 	db.SetMaxIdleConns(global.DatabaseSetting.DBMaxIdleConns)
-
 	return db, nil
 }

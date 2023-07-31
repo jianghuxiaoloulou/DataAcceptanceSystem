@@ -6,7 +6,8 @@ import "database/sql"
 
 var (
 	// 字典数据
-	DictDatas []DictDataObject
+	DictDatas  []DictDataObject
+	SystemData SystemDataObject
 	// 字典表中未配置CODE
 	OtherCode int = 9999
 )
@@ -42,10 +43,14 @@ type HisConfig struct {
 type HospitalConfig struct {
 	HospitalId       sql.NullString // 医院ID
 	HospitalName     sql.NullString // 医院名
+	HISType          sql.NullInt16  // HIS类型：对应HIS厂商类型
 	PacsDBType       sql.NullString // PACS数据库连接类型
 	PacsDBConn       sql.NullString // PACS数据库连接字符串
+	DicomView        sql.NullString // DICOM视图名
+	ApplyView        sql.NullString // PACS提供的申请单视图名
 	PacsInterfaceURL sql.NullString // PACS回写接口URL
-	HISType          sql.NullInt16  // HIS类型：对应HIS厂商类型
+	CenterHospitalID sql.NullString // 上级中心医院的医院ID
+	UploadTime       sql.NullString // PACS数据上传时记录的时间
 }
 
 // 医院申请单状态功能模块配置表
@@ -58,7 +63,8 @@ type ApplyFuncConfig struct {
 	ApplyDrafted    sql.NullString // 申请单状态--已起草（多功能通过|*|分割）
 	ApplyWaitaudit  sql.NullString // 申请单状态--待审核（多功能通过|*|分割）
 	ApplyAudited    sql.NullString // 申请单状态--已审核（多功能通过|*|分割）
-	ApplyCharging   sql.NullString // 申请单状态--计费（多功能通过|*|分割）
+	ApplyCharging   sql.NullString // 申请单状态--主动计费（多功能通过|*|分割）
+	ApplyDiagnose   sql.NullString // 申请单状态--远程诊断（多功能通过|*|分割）
 }
 
 type DictConfig struct {
@@ -70,4 +76,18 @@ type DictConfig struct {
 type DictDataObject struct {
 	Code int
 	Name string
+}
+
+// 系统配置
+
+type SystemCfg struct {
+	QYPacsType         sql.NullString // 区域PACS数据库连接类型
+	QYPacsConn         sql.NullString // 区域PACS数据库连接字符串
+	QYPacsInterfaceUrl sql.NullString // 区域PACS接口URL
+}
+
+type SystemDataObject struct {
+	QYPacsType         string // 区域PACS数据库连接类型
+	QYPacsConn         string // 区域PACS数据库连接字符串
+	QYPacsInterfaceUrl string // 区域PACS接口URL
 }

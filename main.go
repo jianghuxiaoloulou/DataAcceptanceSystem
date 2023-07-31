@@ -4,7 +4,7 @@ import (
 	"WowjoyProject/DataAcceptanceSystem/global"
 	initialize "WowjoyProject/DataAcceptanceSystem/internal/init"
 	"WowjoyProject/DataAcceptanceSystem/internal/routers"
-	"WowjoyProject/DataAcceptanceSystem/pkg/object"
+	rcqfby "WowjoyProject/DataAcceptanceSystem/pkg/RCQFBY"
 	"WowjoyProject/DataAcceptanceSystem/pkg/workpattern"
 	"net/http"
 
@@ -18,7 +18,7 @@ import (
 func main() {
 	initialize.InitSetup()
 	global.Logger.Info("***开始运行PACS集成平台服务***")
-	global.ApplyFormStatusDataChan = make(chan global.ApplyFormStatusData, global.GeneralSetting.MaxThreads)
+	global.DicomDataChan = make(chan global.DicomInfo, global.GeneralSetting.MaxThreads)
 	// 注册工作池，传入任务
 	// 参数1 初始化worker(工人)设置最大线程数
 	wokerPool := workpattern.NewWorkerPool(global.GeneralSetting.MaxThreads)
@@ -28,7 +28,7 @@ func main() {
 	go func() {
 		for {
 			select {
-			case data := <-global.ApplyFormStatusDataChan:
+			case data := <-global.DicomDataChan:
 				sc := &Dosomething{key: data}
 				wokerPool.JobQueue <- sc
 			}
@@ -38,19 +38,14 @@ func main() {
 }
 
 type Dosomething struct {
-	key global.ApplyFormStatusData
+	key global.DicomInfo
 }
 
 func (d *Dosomething) Do() {
 	global.Logger.Info("正在处理的数据是：", d.key)
-	//处理封装对象
-	switch d.key.Bizno {
-	case global.Server_ApplyStatus:
-		// 申请单状态处理
-		global.Logger.Debug("处理申请单状态")
-		object.ApplyFormStatusNotity(d.key)
-	default:
-	}
+	//处理封装对象 上传影像数据
+	rcqfby.UploadDicomData(d.key)
+
 }
 
 func web() {

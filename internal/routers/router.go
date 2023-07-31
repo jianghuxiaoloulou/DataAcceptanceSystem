@@ -15,14 +15,16 @@ func NewRouter() *gin.Engine {
 	{
 		// 通信测试
 		apiv1.POST("/", v1.GetServerTime)
-		// 重新获取字段数据
+		// 更新字典服务
 		apiv1.POST("/Update/DictData", v1.UpdateDictData)
-		// 申请单状态接口
+		// 区域PACS发送申请单状态
 		apiv1.POST("/PACS/ApplyFormStatus", v1.ApplyFormStatus)
-		// 获取患者申请单信息
+		// 区域PACS获取申请单信息
 		apiv1.POST("/PACS/ApplyFormInfo", v1.ApplyFormInfo)
-		// 第三方PACS报告上传接口
+		// 第三方PACS报告数据上传
 		apiv1.POST("/PACS/Upload/ReportInfo", v1.UploadReportInfo)
+		// 第三方PACS申请单和影像数据上传
+		apiv1.POST("/PACS/Upload/ApplyAndDicomInfo", v1.UploadApplyAndDicomInfo)
 	}
 	return r
 }

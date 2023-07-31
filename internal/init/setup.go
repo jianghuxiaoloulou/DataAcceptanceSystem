@@ -16,6 +16,7 @@ import (
 func InitSetup() {
 	ReadSetup()
 	ReadDBDictData()
+	ReadDBSystemData()
 }
 
 func SetupSetting() error {
@@ -84,4 +85,9 @@ func ReadSetup() {
 // 获取字典数据，保存为全局数据
 func ReadDBDictData() {
 	model.GetDictData()
+}
+
+// 获取系统数据，保存为全局数据
+func ReadDBSystemData() {
+	model.GetSystemData()
 }
