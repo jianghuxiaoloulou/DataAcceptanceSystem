@@ -29,6 +29,7 @@ func GetDictData() {
 		}
 		global.DictDatas = append(global.DictDatas, data)
 	}
+	global.Logger.Debug(global.DictDatas)
 }
 
 // 获取字典NAME

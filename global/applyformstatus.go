@@ -11,6 +11,7 @@ const (
 	Apply_Status_WaitAudit  int = 105 // 待审核
 	Apply_Status_Audited    int = 106 // 已审核
 	Apply_Status_Diagnose   int = 107 // 远程诊断
+	Apply_Status_ViewRemote int = 108 // 远程查看
 	Apply_Status_Charging   int = 199 // 主动计费
 )
 

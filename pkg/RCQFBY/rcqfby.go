@@ -9,10 +9,10 @@ import (
 	"database/sql"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 // 获取申请单数据
@@ -71,7 +71,7 @@ func UploadApplyData(db *sql.DB, hospitalid string, data global.RcqfbtApplyData)
 		return
 	}
 	defer resp.Body.Close()
-	resp_body, err := ioutil.ReadAll(resp.Body)
+	resp_body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		global.Logger.Error(err)
 		return
@@ -145,7 +145,7 @@ func UploadDicomData(data global.DicomInfo) {
 		return
 	}
 	defer resp.Body.Close()
-	resp_body, _ := ioutil.ReadAll(resp.Body)
+	resp_body, _ := io.ReadAll(resp.Body)
 	global.Logger.Info("resp.Body: ", string(resp_body))
 }
 
@@ -167,7 +167,7 @@ func UploadReportData(data global.ReportInfo) {
 		return
 	}
 	defer resp.Body.Close()
-	resp_body, err := ioutil.ReadAll(resp.Body)
+	resp_body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		global.Logger.Error(err)
 		return
@@ -250,12 +250,85 @@ func SendRemoteDiagnoseApplyData(hospitalid, applyid string) {
 		HealthHistory:    objdata.Data.MedicalHistory,
 		IsEmergency:      objdata.Data.MergencyStatus,
 		BedNo:            objdata.Data.SickbedNumberName,
-		CurrentAge:       objdata.Data.AgeUnitName,
+		CurrentAge:       strconv.Itoa(objdata.Data.Age) + objdata.Data.AgeUnitName,
 		Registrar:        objdata.Data.RegisterDoctorCode,
 		RegisterDt:       objdata.Data.RegisterTime,
 		Technician:       objdata.Data.StudyDoctorCode,
 		ExamineDt:        objdata.Data.StudyTime,
+		Status:           1,
 		CheckItems:       FlpCheckItems,
+	}
+	SyncFLPPacsApplyData(obj, centerHospital.PacsInterfaceURL.String)
+}
+
+// (函数功能F)申请远程查看发送申请单和报告到飞利浦PACS
+func SendRemoteViewApplyData(hospitalid, applyid string) {
+	global.Logger.Debug("通过接口获取远程查看申请单信息：", applyid)
+	// 获取区域PACS申请单信息和报告
+	objdata := GetQYPacsApplyReportData(applyid)
+	// 1.通过HospitalID 获取医院相关数据库连接信息
+	hospitalConfig, err := model.GetHospitalConfig(hospitalid)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	global.Logger.Debug("获取的医院相关连接信息：", hospitalConfig)
+
+	// 获取上传中心医院的接口信息
+	centerHospital, err := model.GetHospitalConfig(hospitalConfig.CenterHospitalID.String)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	global.Logger.Debug("中心医院信息：", centerHospital)
+
+	// 发送申请单数据到飞利浦PACS
+	global.Logger.Debug("发送申请单数据到飞利浦PACS: ", objdata)
+	var FlpCheckItems []global.FLP_CheckItem
+	for _, body := range objdata.Data.BodyPartList {
+		for _, item := range body.ProjectList {
+			flpitem := global.FLP_CheckItem{
+				ProcedureCode: item.ProjectCode,
+				CheckingItem:  item.ProjectName,
+				ModalityType:  objdata.Data.ModalityName,
+				Modality:      objdata.Data.DeviceName,
+				RemoteRPID:    objdata.Data.RegisterId,
+			}
+			FlpCheckItems = append(FlpCheckItems, flpitem)
+		}
+	}
+	obj := global.FLPPACSApplyData{
+		SiteName:         objdata.Data.HospitalId,
+		PatientID:        objdata.Data.PatientCode,
+		LocalName:        objdata.Data.PatientName,
+		EnglishName:      objdata.Data.PatientSpellName,
+		ReferenceNo:      objdata.Data.IdCardNumber,
+		Birthday:         objdata.Data.Birthday,
+		Gender:           objdata.Data.PatientSexName,
+		Address:          objdata.Data.Address,
+		Telephone:        objdata.Data.PhoneNumber,
+		RemotePID:        objdata.Data.RequestNumber,
+		Marriage:         "",
+		AccNo:            objdata.Data.AccessionNumber,
+		ApplyDept:        objdata.Data.RequestDepartmentName,
+		ApplyDoctor:      objdata.Data.RequestDoctorName,
+		StudyInstanceUID: "",
+		CardNo:           objdata.Data.MedicareCardNumber,
+		InhospitalNo:     objdata.Data.ClinicNumber,
+		ClinicNo:         objdata.Data.ClinicNumber,
+		PatientType:      objdata.Data.PatientTypeName,
+		Observation:      objdata.Data.ClinicalDiagnosis,
+		HealthHistory:    objdata.Data.MedicalHistory,
+		IsEmergency:      objdata.Data.MergencyStatus,
+		BedNo:            objdata.Data.SickbedNumberName,
+		CurrentAge:       strconv.Itoa(objdata.Data.Age) + objdata.Data.AgeUnitName,
+		Registrar:        objdata.Data.RegisterDoctorCode,
+		RegisterDt:       objdata.Data.RegisterTime,
+		Technician:       objdata.Data.StudyDoctorCode,
+		ExamineDt:        objdata.Data.StudyTime,
+		Status:           2,
+		CheckItems:       FlpCheckItems,
+		ReportData:       objdata.Data.ReportData,
 	}
 	SyncFLPPacsApplyData(obj, centerHospital.PacsInterfaceURL.String)
 }
@@ -276,7 +349,7 @@ func SyncFLPPacsApplyData(data global.FLPPACSApplyData, url string) {
 		return
 	}
 	defer resp.Body.Close()
-	resp_body, err := ioutil.ReadAll(resp.Body)
+	resp_body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		global.Logger.Error(err)
 		return
@@ -298,7 +371,36 @@ func GetQYPacsApplyData(registerid string) (data global.QYPacsApplyData) {
 		return
 	}
 	defer resp.Body.Close()
-	resp_body, err := ioutil.ReadAll(resp.Body)
+	resp_body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	global.Logger.Info("resp.Body: ", string(resp_body))
+
+	err = json.Unmarshal(resp_body, &data)
+	if err != nil {
+		global.Logger.Error("resp.Body err ", err)
+		return
+	}
+	return
+}
+
+// 获取区域PACS申请单数据和报告
+func GetQYPacsApplyReportData(registerid string) (data global.QYPacsApplyData) {
+	global.Logger.Debug("开始获取区域PACS申请单和报告数据：", registerid)
+	url := global.SystemData.QYPacsInterfaceUrl
+	url += "//"
+	url += "ms-qypacs-data//v1//register//report//"
+	url += registerid
+	global.Logger.Debug("操作的URL: ", url)
+	resp, err := http.Get(url)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	defer resp.Body.Close()
+	resp_body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		global.Logger.Error(err)
 		return

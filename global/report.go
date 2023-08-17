@@ -46,6 +46,7 @@ type ReportInfo struct {
 	ReportDoctorCode          string                  `json:"reportDoctorCode"`          // 报告医生编码
 	HisReportDoctorCode       string                  `json:"hisReportDoctorCode"`       // his报告医生编号
 	AuditTime                 string                  `json:"auditTime"`                 // 审核时间
+	ReportUpdateTime          string                  `json:"reportUpdateTime"`          // 报告修订时间
 	AuditDoctorId             string                  `json:"auditDoctorId"`             // 审核医生id
 	AuditDoctorName           string                  `json:"auditDoctorName"`           // 审核医生名称
 	AuditDoctorCode           string                  `json:"auditDoctorCode"`           // 审核医生编码

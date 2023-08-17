@@ -86,6 +86,7 @@ func UpdateDictData(c *gin.Context) {
 	global.Logger.Debug(reqIP, " get dict data: ", param)
 	// 获取字典数据
 	model.GetDictData()
+	model.GetSystemData()
 	// 返回结果
 	ack_info := global.AckInfo{
 		Code: 0,

@@ -188,29 +188,10 @@ func ApplyFormStatusNotity(data global.ApplyFormStatusData) {
 		}
 	case global.Apply_Status_Diagnose:
 		global.Logger.Debug(data.PARAM.ParamValue, " 申请单开始申请远程诊断")
-		if applyFuncCfg.ApplyDiagnose.String != "" {
-			global.Logger.Debug("开始处理申请单远程诊断状态处理的功能")
-			// 分隔符|*|
-			applyDiag := strings.Split(applyFuncCfg.ApplyDiagnose.String, "|*|")
-			global.Logger.Debug("需要实现的功能：", applyDiag)
-			for _, value := range applyDiag {
-				switch value {
-				case global.Apply_Func_A:
-					global.Logger.Debug("实现功能A")
-				case global.Apply_Func_B:
-					global.Logger.Debug("实现功能B")
-				case global.Apply_Func_C:
-					global.Logger.Debug("实现功能C")
-				case global.Apply_Func_D:
-					global.Logger.Debug("实现功能D")
-				case global.Apply_Func_E:
-					global.Logger.Debug("实现功能E: 申请远程诊断发送申请单到飞利浦PACS")
-					rcqfby.SendRemoteDiagnoseApplyData(data.HospitalID, data.PARAM.ParamValue)
-				default:
-					global.Logger.Debug("未实现该功能")
-				}
-			}
-		}
+		rcqfby.SendRemoteDiagnoseApplyData(data.HospitalID, data.PARAM.ParamValue)
+	case global.Apply_Status_ViewRemote:
+		global.Logger.Debug(data.PARAM.ParamValue, " 申请单开始申请远程查看")
+		rcqfby.SendRemoteViewApplyData(data.HospitalID, data.PARAM.ParamValue)
 	default:
 		global.Logger.Debug(data.PARAM.ParamValue, " 申请单未知状态")
 	}
