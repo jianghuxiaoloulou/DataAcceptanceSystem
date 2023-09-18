@@ -13,6 +13,9 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
+
+	"github.com/jlaffaye/ftp"
 )
 
 // 获取申请单数据
@@ -23,7 +26,7 @@ func GetApplyData(hospital global.HospitalConfig, object global.ApplyDicomData) 
 		sex_code,sex_name,age,age_unit,birthday,modality_code,project_code,project_name,project_fee,project_note,project_detail_id,
 		bodypart_code,bodypart,project_count,clinic_number,visit_card_number,phone_number,patient_section_code,patient_section_name,
 		sickbed_number,request_time,id_card_number,address,clinical_diagnosis,medical_history,request_department_code,
-		request_department_name,request_doctor_code,request_doctor_name,check_note,film_count,film_type,graphic_report,
+		request_department_name,request_doctor_code,request_doctor_name,check_note, ,film_type,graphic_report,
 		emergency,isolation_flag,greenchan_flag,fee,rmethod_name,accession_number,patient_code,his_patient_id,register_status,
 		register_doctor_id,register_doctor_code,register_doctor_name,register_time,queue_number,device_id,device_code,device_name,
 		study_doctor_id,study_doctor_code,study_doctor_name,assist_doctor_id,assist_doctor_code,assist_doctor_name,
@@ -100,7 +103,7 @@ func UploadApplyData(db *sql.DB, hospitalid string, data global.RcqfbtApplyData)
 func GetDicomData(db *sql.DB, hospital global.HospitalConfig, accessionnumber string) {
 	global.Logger.Debug("开始通过SQL SERVER 视图获取DICOM数据：")
 	var sql string
-	sql = `select accession_number,study_instance_uid,series_instance_uid,sop_instance_uid,dicom_file_name,user,password,update_time`
+	sql = `select accession_number,study_instance_uid,series_instance_uid,sop_instance_uid,file_type,dicom_file_name,host,port,user,password,update_time`
 	sql += " from " + hospital.DicomView.String + " where accession_number = "
 	sql += "'" + accessionnumber + "'"
 	global.Logger.Debug("执行的sql: ", sql)
@@ -126,30 +129,72 @@ func UploadDicomData(data global.DicomInfo) {
 		global.Logger.Error("error writing to buffer")
 		return
 	}
-	//打开文件句柄操作
-	fh, err := os.Open(data.DicomFileName)
-	if err != nil {
-		global.Logger.Error("error opening file")
-		return
+	// 判断获取DICOM文件类型
+	if data.FileType == global.Dicom_Type_FTP {
+		global.Logger.Debug("开始通过FTP方式获取DICOM影像数据")
+		c, err := ftp.Dial(data.Host+":"+data.Port, ftp.DialWithTimeout(5*time.Second))
+		if err != nil {
+			global.Logger.Error("连接FTP服务器错误，", data)
+			return
+		}
+		defer c.Quit()
+
+		// 登录
+		err = c.Login(data.User, data.Password)
+		if err != nil {
+			global.Logger.Error("登录FTP服务器错误，", data)
+			return
+		}
+		// 读取文件
+		body, err := c.Retr(data.DicomFileName)
+		if err != nil {
+			global.Logger.Error("读取FTP文件错误", err)
+			return
+		}
+		defer body.Close()
+		_, err = io.Copy(fileWriter, body)
+		if err != nil {
+			global.Logger.Error("拷贝数据流量错误: ", err)
+			return
+		}
+		contentType := bodyWriter.FormDataContentType()
+		bodyWriter.Close()
+		resp, err := http.Post(url, contentType, bodyBuf)
+		if err != nil {
+			global.Logger.Error("http post err : ", err)
+			return
+		}
+		defer resp.Body.Close()
+		resp_body, _ := io.ReadAll(resp.Body)
+		global.Logger.Info("resp.Body: ", string(resp_body))
+
+	} else if data.FileType == global.Dicom_Type_Share {
+		global.Logger.Debug("开始通过匿名访问共享的方式获取DICOM影像数据")
+		//打开文件句柄操作
+		fh, err := os.Open(data.DicomFileName)
+		if err != nil {
+			global.Logger.Error("error opening file")
+			return
+		}
+		//iocopy
+		_, err = io.Copy(fileWriter, fh)
+		if err != nil {
+			return
+		}
+		contentType := bodyWriter.FormDataContentType()
+		bodyWriter.Close()
+		fh.Close()
+		resp, err := http.Post(url, contentType, bodyBuf)
+		if err != nil {
+			return
+		}
+		defer resp.Body.Close()
+		resp_body, _ := io.ReadAll(resp.Body)
+		global.Logger.Info("resp.Body: ", string(resp_body))
 	}
-	//iocopy
-	_, err = io.Copy(fileWriter, fh)
-	if err != nil {
-		return
-	}
-	contentType := bodyWriter.FormDataContentType()
-	bodyWriter.Close()
-	fh.Close()
-	resp, err := http.Post(url, contentType, bodyBuf)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	resp_body, _ := io.ReadAll(resp.Body)
-	global.Logger.Info("resp.Body: ", string(resp_body))
 }
 
-// 上传报告数据
+// 上传报告数据到区域PACS
 func UploadReportData(data global.ReportInfo) {
 	global.Logger.Debug("开始执行济宁医学院报告数据上传区域PACS", data)
 	reqdata, err := json.Marshal(data)
@@ -188,6 +233,38 @@ func UploadReportData(data global.ReportInfo) {
 			global.Logger.Error("任城区妇保院报告数据上传失败：", data.RegisterId)
 		}
 	}
+}
+
+// 通过存储过程回写数据到妇保院
+func WriteBackProc(data global.ReportInfo) {
+	global.Logger.Debug("开始执行济宁医学院报告数据通过存储过程上传到妇保院", data)
+	// 1.通过HospitalID 获取医院相关数据库连接信息
+	hospitalConfig, err := model.GetHospitalConfig(data.HospitalId)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	global.Logger.Debug("获取的医院相关连接信息：", hospitalConfig)
+	// 获取临时数据库引擎
+	PacsDB, err := model.NewTempDBEngine(hospitalConfig.PacsDBType.String, hospitalConfig.PacsDBConn.String)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	sql := "exec RCFY_CT_REPORT @Str_StudyInstanceUID = " + "123456" + ","
+	sql += "@Str_results = " + data.Conclusion + ","
+	sql += "@Str_finding = " + data.Finding + ","
+	sql += "@Str_reportdoc = " + data.ReportDoctorName + ","
+	sql += "@Str_auditdoc = " + data.AuditDoctorName + ","
+	sql += "@Str_WriteDateTime = " + "'" + data.ReportTime + "',"
+	sql += "@str_ReferringDate = " + "'" + data.AuditTime + "',"
+	sql += "@Str_ReportStatus = " + "3"
+	_, err = PacsDB.Query(sql)
+	if err != nil {
+		global.Logger.Error("回写存储过程错误，err: ", err)
+		return
+	}
+	global.Logger.Debug("回写报告，调用存储过程完成")
 }
 
 // (函数功能E)申请远程诊断发送申请单到飞利浦PACS
@@ -241,7 +318,7 @@ func SendRemoteDiagnoseApplyData(hospitalid, applyid string) {
 		AccNo:            objdata.Data.AccessionNumber,
 		ApplyDept:        objdata.Data.RequestDepartmentName,
 		ApplyDoctor:      objdata.Data.RequestDoctorName,
-		StudyInstanceUID: "",
+		StudyInstanceUID: objdata.Data.StudyInstanceUid,
 		CardNo:           objdata.Data.MedicareCardNumber,
 		InhospitalNo:     objdata.Data.ClinicNumber,
 		ClinicNo:         objdata.Data.ClinicNumber,

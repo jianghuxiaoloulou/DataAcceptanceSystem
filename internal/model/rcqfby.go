@@ -12,7 +12,7 @@ func GetRcqfbyApplyData(db *sql.DB, sql, hospitalid string) (data []global.Rcqfb
 	global.Logger.Debug("开始查询视图数据.....")
 	rows, err := db.Query(sql)
 	if err != nil {
-		global.Logger.Error(err)
+		global.Logger.Error("QUery err: ", err.Error())
 		return
 	}
 	defer rows.Close()
@@ -31,9 +31,10 @@ func GetRcqfbyApplyData(db *sql.DB, sql, hospitalid string) (data []global.Rcqfb
 			&key.StudyDoctorId, &key.StudyDoctorCode, &key.StudyDoctorName, &key.AssistDoctorId, &key.AssistDoctorCode,
 			&key.AssistDoctorName, &key.OperationDoctorId, &key.OperationDoctorCode, &key.OperationDoctorName)
 		if err != nil {
-			global.Logger.Error(err)
+			global.Logger.Error("Scan err: ", err.Error())
 			return
 		}
+		global.Logger.Debug("查询到的数据：", key)
 		// 获取性别编码
 		var sexCode int
 		if key.SexName.String != "" {
@@ -211,7 +212,7 @@ func GetRcqfbyDicomData(db *sql.DB, sql, hospitalid string) {
 	for rows.Next() {
 		key := global.DicomDB{}
 		rows.Scan(&key.AccessionNumber, &key.StudyInstanceUid, &key.SeriesInstanceUid, &key.SopInstanceUid,
-			&key.DicomFileName, &key.User, &key.Password, &key.UpdateTime)
+			&key.FileType, &key.DicomFileName, &key.Host, &key.Port, &key.User, &key.Password, &key.UpdateTime)
 
 		data := global.DicomInfo{
 			HospitalID:        hospitalid,
@@ -219,12 +220,16 @@ func GetRcqfbyDicomData(db *sql.DB, sql, hospitalid string) {
 			StudyInstanceUid:  key.StudyInstanceUid.String,
 			SeriesInstanceUid: key.SeriesInstanceUid.String,
 			SopInstanceUid:    key.SopInstanceUid.String,
+			FileType:          int(key.FileType.Int16),
 			DicomFileName:     key.DicomFileName.String,
+			Host:              key.Host.String,
+			Port:              key.Port.String,
 			User:              key.User.String,
 			Password:          key.Password.String,
 			UpdateTime:        key.UpdateTime.String,
 		}
 		// 工厂模式单独处理DICOM影像上传
+		global.Logger.Debug("需要处理的DICOM 数据是：", data)
 		global.DicomDataChan <- data
 	}
 }

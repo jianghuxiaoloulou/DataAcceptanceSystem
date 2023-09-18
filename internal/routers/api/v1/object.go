@@ -231,7 +231,7 @@ func UploadReportInfo(c *gin.Context) {
 	// 1. 上传报告到区域PACS
 	go rcqfby.UploadReportData(reportdata.PARAM)
 	// 2. 回写报告到任城区妇保院（医院提供存储过程）
-
+	go rcqfby.WriteBackProc(reportdata.PARAM)
 	// 返回结果
 	ack_info := global.AckInfo{
 		Code: 0,

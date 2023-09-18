@@ -76,6 +76,7 @@ type RcqfbtApplyInfo struct {
 
 type RcqfbtApplyData struct {
 	HospitalId            string         `json:"hospitalId"`            // 医院id
+	StudyInstanceUid      string         `json:"studyInstanceUid"`      // Dicom中study_instance_uid
 	RegisterId            string         `json:"registerId"`            // 登记单id
 	PatientCode           string         `json:"patientCode"`           // 患者编号
 	HisPatientId          string         `json:"hisPatientId"`          // his患者唯一id
