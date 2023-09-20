@@ -6,7 +6,7 @@ package global
 type ReportData struct {
 	Bizno string     `json:"bizno" binding:"required"`
 	Time  string     `json:"time" binding:"required"`
-	PARAM ReportInfo `json:"report_info" binding:"required"`
+	PARAM ReportInfo `json:"report_info"`
 }
 
 // 报告数据
@@ -34,8 +34,9 @@ type ReportKeyData struct {
 // 报告回写信息
 type ReportInfo struct {
 	HospitalId                string                  `json:"hospitalId"`                // 医院ID
+	StudyInstanceUid          string                  `json:"studyInstanceUid"`          // Dicom中study_instance_uid
 	RegisterId                string                  `json:"registerId"`                // 登记单唯一ID
-	RegisterStatus            int                     `json:"registerStatus"`            // 申请单状态
+	RegisterStatus            string                  `json:"registerStatus"`            // 申请单状态
 	PositiveNegativeStatus    int                     `json:"positiveNegativeStatus"`    // 阴阳性（0-阴性，1-阳性）
 	PathologyStatus           int                     `json:"pathologyStatus"`           // 病理状态（0-阴性，1-阳性）
 	Finding                   string                  `json:"finding"`                   // 影像所见

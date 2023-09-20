@@ -78,6 +78,7 @@ go build -ldflags="-H windowsgui" -o .\DataAcceptanceSystem\DataAcceptanceSystem
 
 
 # 修改记录
+* 2023/09/20 增加FTP下载文件和sql server 数据库
 * 2023/08/17 增加远程查看接口
 * 2023/07/10 增加对接第三方PACS数据接口(上传的申请单数据应该从区域PACS中获取)
 * 2023/06/15 重构PACS集成平台设计（修改对接区域PACS，对接多家HIS，增加医院配置，HIS配置，功能模块配置，字典表）

@@ -10,9 +10,13 @@ import (
 // 任城区妇保院申请单数据
 func GetRcqfbyApplyData(db *sql.DB, sql, hospitalid string) (data []global.RcqfbtApplyData) {
 	global.Logger.Debug("开始查询视图数据.....")
+
+	if db.Ping() != nil {
+		global.Logger.Error("db.Ping() err:", db.Ping())
+	}
 	rows, err := db.Query(sql)
 	if err != nil {
-		global.Logger.Error("QUery err: ", err.Error())
+		global.Logger.Error("Query err: ", err)
 		return
 	}
 	defer rows.Close()

@@ -8,14 +8,14 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"mime/multipart"
+	"net"
 	"net/http"
 	"os"
 	"strconv"
-	"time"
-
-	"github.com/jlaffaye/ftp"
+	"strings"
 )
 
 // 获取申请单数据
@@ -26,12 +26,12 @@ func GetApplyData(hospital global.HospitalConfig, object global.ApplyDicomData) 
 		sex_code,sex_name,age,age_unit,birthday,modality_code,project_code,project_name,project_fee,project_note,project_detail_id,
 		bodypart_code,bodypart,project_count,clinic_number,visit_card_number,phone_number,patient_section_code,patient_section_name,
 		sickbed_number,request_time,id_card_number,address,clinical_diagnosis,medical_history,request_department_code,
-		request_department_name,request_doctor_code,request_doctor_name,check_note, ,film_type,graphic_report,
+		request_department_name,request_doctor_code,request_doctor_name,check_note,film_count,film_type,graphic_report,
 		emergency,isolation_flag,greenchan_flag,fee,rmethod_name,accession_number,patient_code,his_patient_id,register_status,
 		register_doctor_id,register_doctor_code,register_doctor_name,register_time,queue_number,device_id,device_code,device_name,
 		study_doctor_id,study_doctor_code,study_doctor_name,assist_doctor_id,assist_doctor_code,assist_doctor_name,
 		operation_doctor_id,operation_doctor_code,operation_doctor_name`
-	sql += " from " + hospital.ApplyView.String + " where 1 = 1 "
+	sql += " from dbo." + hospital.ApplyView.String + " where 1 = 1 "
 	// 通过申请单时间升序获取数据
 	sql += " and (" + " request_time between '" + object.PARAM.StartDate + "' and '" + object.PARAM.EndDate + "'" + ")"
 	sql += " order by request_time asc"
@@ -41,7 +41,7 @@ func GetApplyData(hospital global.HospitalConfig, object global.ApplyDicomData) 
 	// 获取临时数据库引擎
 	PacsDB, err := model.NewTempDBEngine(hospital.PacsDBType.String, hospital.PacsDBConn.String)
 	if err != nil {
-		global.Logger.Error(err)
+		global.Logger.Error("获取临时数据库引擎db err: ", err.Error())
 		return
 	}
 
@@ -104,7 +104,7 @@ func GetDicomData(db *sql.DB, hospital global.HospitalConfig, accessionnumber st
 	global.Logger.Debug("开始通过SQL SERVER 视图获取DICOM数据：")
 	var sql string
 	sql = `select accession_number,study_instance_uid,series_instance_uid,sop_instance_uid,file_type,dicom_file_name,host,port,user,password,update_time`
-	sql += " from " + hospital.DicomView.String + " where accession_number = "
+	sql += " from dbo." + hospital.DicomView.String + " where accession_number = "
 	sql += "'" + accessionnumber + "'"
 	global.Logger.Debug("执行的sql: ", sql)
 	model.GetRcqfbyDicomData(db, sql, hospital.HospitalId.String)
@@ -132,27 +132,96 @@ func UploadDicomData(data global.DicomInfo) {
 	// 判断获取DICOM文件类型
 	if data.FileType == global.Dicom_Type_FTP {
 		global.Logger.Debug("开始通过FTP方式获取DICOM影像数据")
-		c, err := ftp.Dial(data.Host+":"+data.Port, ftp.DialWithTimeout(5*time.Second))
-		if err != nil {
-			global.Logger.Error("连接FTP服务器错误，", data)
-			return
-		}
-		defer c.Quit()
 
-		// 登录
-		err = c.Login(data.User, data.Password)
+		// 连接FTP服务器
+		conn, err := net.Dial("tcp", data.Host+":"+data.Port)
 		if err != nil {
-			global.Logger.Error("登录FTP服务器错误，", data)
+			global.Logger.Debug("连接FTP服务器失败:", err)
 			return
 		}
-		// 读取文件
-		body, err := c.Retr(data.DicomFileName)
+		defer conn.Close()
+
+		// 读取服务器返回的欢迎消息
+		buff := make([]byte, 1024)
+		n, err := conn.Read(buff)
 		if err != nil {
-			global.Logger.Error("读取FTP文件错误", err)
+			global.Logger.Debug("读取欢迎消息失败:", err)
 			return
 		}
-		defer body.Close()
-		_, err = io.Copy(fileWriter, body)
+		global.Logger.Debug(string(buff[:n]))
+
+		// 发送登录命令
+		cmd := "USER " + data.User + "\r\n"
+		_, err = conn.Write([]byte(cmd))
+		if err != nil {
+			global.Logger.Debug("发送登录命令失败:", err)
+			return
+		}
+
+		n, err = conn.Read(buff)
+		if err != nil {
+			global.Logger.Debug("读取登录响应失败:", err)
+			return
+		}
+		global.Logger.Debug(string(buff[:n]))
+
+		// 发送密码命令
+		cmd = "PASS " + data.Password + "\r\n"
+		_, err = conn.Write([]byte(cmd))
+		if err != nil {
+			global.Logger.Debug("发送密码命令失败:", err)
+			return
+		}
+
+		n, err = conn.Read(buff)
+		if err != nil {
+			global.Logger.Debug("读取密码响应失败:", err)
+			return
+		}
+		global.Logger.Debug(string(buff[:n]))
+
+		// 发送 PASV 命令，进入被动模式
+		cmd = "PASV\r\n"
+		_, err = conn.Write([]byte(cmd))
+		if err != nil {
+			global.Logger.Debug("发送PASV命令失败:", err)
+			return
+		}
+
+		n, err = conn.Read(buff)
+		if err != nil {
+			global.Logger.Debug("读取PASV响应失败:", err)
+			return
+		}
+		global.Logger.Debug(string(buff[:n]))
+
+		// 解析被动模式返回的地址和端口
+		_, port := parsePasvResponse(string(buff[:n]))
+
+		// 主动连接到服务器的数据端口
+		dataConn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", data.Host, port))
+		if err != nil {
+			global.Logger.Debug("连接数据端口失败:", err)
+			return
+		}
+		defer dataConn.Close()
+		// 发送下载文件命令
+		cmd = "RETR " + data.DicomFileName + "\r\n"
+		_, err = conn.Write([]byte(cmd))
+		if err != nil {
+			global.Logger.Debug("发送下载文件命令失败:", err)
+			return
+		}
+
+		n, err = conn.Read(buff)
+		if err != nil {
+			global.Logger.Debug("读取下载文件响应失败:", err)
+			return
+		}
+		global.Logger.Debug(string(buff[:n]))
+
+		/////////
+		_, err = io.Copy(fileWriter, dataConn)
 		if err != nil {
 			global.Logger.Error("拷贝数据流量错误: ", err)
 			return
@@ -167,6 +236,7 @@ func UploadDicomData(data global.DicomInfo) {
 		defer resp.Body.Close()
 		resp_body, _ := io.ReadAll(resp.Body)
 		global.Logger.Info("resp.Body: ", string(resp_body))
+		global.Logger.Info("Dicom文件上传成功：", data.DicomFileName)
 
 	} else if data.FileType == global.Dicom_Type_Share {
 		global.Logger.Debug("开始通过匿名访问共享的方式获取DICOM影像数据")
@@ -251,14 +321,16 @@ func WriteBackProc(data global.ReportInfo) {
 		global.Logger.Error(err)
 		return
 	}
-	sql := "exec RCFY_CT_REPORT @Str_StudyInstanceUID = " + "123456" + ","
-	sql += "@Str_results = " + data.Conclusion + ","
-	sql += "@Str_finding = " + data.Finding + ","
-	sql += "@Str_reportdoc = " + data.ReportDoctorName + ","
-	sql += "@Str_auditdoc = " + data.AuditDoctorName + ","
+	sql := "exec dbo.RCFY_CT_REPORT @Str_StudyInstanceUID = '" + data.StudyInstanceUid + "',"
+	sql += "@Str_results = '" + data.Conclusion + "',"
+	sql += "@Str_finding = '" + data.Finding + "',"
+	sql += "@Str_reportdoc = '" + data.ReportDoctorName + "',"
+	sql += "@Str_auditdoc = '" + data.AuditDoctorName + "',"
 	sql += "@Str_WriteDateTime = " + "'" + data.ReportTime + "',"
 	sql += "@str_ReferringDate = " + "'" + data.AuditTime + "',"
-	sql += "@Str_ReportStatus = " + "3"
+	sql += "@Str_ReportStatus = " + "'3'"
+
+	global.Logger.Debug("执行存储过程的sql: ", sql)
 	_, err = PacsDB.Query(sql)
 	if err != nil {
 		global.Logger.Error("回写存储过程错误，err: ", err)
@@ -490,4 +562,23 @@ func GetQYPacsApplyReportData(registerid string) (data global.QYPacsApplyData) {
 		return
 	}
 	return
+}
+
+func parsePasvResponse(response string) (string, int) {
+	start, end := strings.Index(response, "("), strings.Index(response, ")")
+	if start == -1 || end == -1 {
+		return "", 0
+	}
+
+	addrParts := strings.Split(response[start+1:end], ",")
+	addr := fmt.Sprintf("%s.%s.%s.%s", addrParts[0], addrParts[1], addrParts[2], addrParts[3])
+	port := (toInt(addrParts[4]) << 8) + toInt(addrParts[5])
+
+	return addr, port
+}
+
+func toInt(s string) int {
+	var result int
+	fmt.Sscanf(s, "%d", &result)
+	return result
 }
