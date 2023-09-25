@@ -55,6 +55,43 @@ func GetApplyData(hospital global.HospitalConfig, object global.ApplyDicomData) 
 	}
 }
 
+// 获取申请单数据
+func GetApplyDataTime(hospital global.HospitalConfig, object global.ApplyDicomData) {
+	global.Logger.Debug("开始通过SQL SERVER 视图获取申请单数据：")
+	var sql string
+	sql = `select his_apply_id,his_apply_jlid,patient_name,patient_spell_name,patient_type_code,patient_type_name,medical_record_number,
+		sex_code,sex_name,age,age_unit,birthday,modality_code,project_code,project_name,project_fee,project_note,project_detail_id,
+		bodypart_code,bodypart,project_count,clinic_number,visit_card_number,phone_number,patient_section_code,patient_section_name,
+		sickbed_number,request_time,id_card_number,address,clinical_diagnosis,medical_history,request_department_code,
+		request_department_name,request_doctor_code,request_doctor_name,check_note,film_count,film_type,graphic_report,
+		emergency,isolation_flag,greenchan_flag,fee,rmethod_name,accession_number,patient_code,his_patient_id,register_status,
+		register_doctor_id,register_doctor_code,register_doctor_name,register_time,queue_number,device_id,device_code,device_name,
+		study_doctor_id,study_doctor_code,study_doctor_name,assist_doctor_id,assist_doctor_code,assist_doctor_name,
+		operation_doctor_id,operation_doctor_code,operation_doctor_name`
+	sql += " from dbo." + hospital.ApplyView.String + " where 1 = 1 "
+	// 通过申请单时间升序获取数据
+	sql += " and (" + " request_time between '" + hospital.UploadTime.String + "' and '" + object.PARAM.EndDate + "'" + ")"
+	sql += " order by request_time asc"
+
+	global.Logger.Debug("执行的sql: ", sql)
+
+	// 获取临时数据库引擎
+	PacsDB, err := model.NewTempDBEngine(hospital.PacsDBType.String, hospital.PacsDBConn.String)
+	if err != nil {
+		global.Logger.Error("获取临时数据库引擎db err: ", err.Error())
+		return
+	}
+
+	data := model.GetRcqfbyApplyData(PacsDB, sql, hospital.HospitalId.String)
+	global.Logger.Debug("获取的申请单数据：", data)
+	for _, value := range data {
+		// 上传申请单数据
+		go UploadApplyData(PacsDB, hospital.HospitalId.String, value)
+		// 获取DICOM数据
+		go GetDicomData(PacsDB, hospital, value.AccessionNumber)
+	}
+}
+
 // 上传申请单数据
 func UploadApplyData(db *sql.DB, hospitalid string, data global.RcqfbtApplyData) {
 	global.Logger.Debug("开始执行任城区妇保院申请单数据上传", data)

@@ -289,3 +289,50 @@ func UploadApplyAndDicomInfo(c *gin.Context) {
 	result.Info = ack_info
 	c.JSON(http.StatusOK, result)
 }
+
+// 第三方PACS申请单和影像数据上传
+func UploadApplyAndDicomInfoTime(c *gin.Context) {
+	reqIP := c.ClientIP()
+	global.Logger.Debug("请求的主机IP: ", reqIP)
+	var applydicom global.ApplyDicomData
+	var result global.ApplyFormStatusResult
+	err := c.ShouldBind(&applydicom)
+	if err != nil {
+		global.Logger.Error(reqIP, " bind error", applydicom)
+		ack_info := global.AckInfo{
+			Code: 1,
+			Msg:  err.Error(),
+		}
+		result.Bizno = applydicom.Bizno
+		result.Time = time.Now().Format("20060102150405")
+		result.HospitalID = applydicom.HospitalID
+		result.Info = ack_info
+		c.JSON(http.StatusBadRequest, result)
+		return
+	}
+	if applydicom.Bizno != global.Server_ApplyAndDicom {
+		ack_info := global.AckInfo{
+			Code: 1,
+			Msg:  "交易编码错误，正确编码：" + global.Server_ApplyAndDicom,
+		}
+		result.Bizno = applydicom.Bizno
+		result.Time = time.Now().Format("20060102150405")
+		result.HospitalID = applydicom.HospitalID
+		result.Info = ack_info
+		c.JSON(http.StatusBadRequest, result)
+		return
+	}
+	global.Logger.Debug(reqIP, " Server Data: ", applydicom)
+	// 获取申请单和DICOM影像数据上传
+	object.GetApplyAndDicomDataTime(applydicom)
+	// 返回结果
+	ack_info := global.AckInfo{
+		Code: 0,
+		Msg:  "successful",
+	}
+	result.Bizno = applydicom.Bizno
+	result.Time = time.Now().Format("20060102150405")
+	result.HospitalID = applydicom.HospitalID
+	result.Info = ack_info
+	c.JSON(http.StatusOK, result)
+}

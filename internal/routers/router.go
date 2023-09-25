@@ -25,6 +25,9 @@ func NewRouter() *gin.Engine {
 		apiv1.POST("/PACS/Upload/ReportInfo", v1.UploadReportInfo)
 		// 第三方PACS申请单和影像数据上传
 		apiv1.POST("/PACS/Upload/ApplyAndDicomInfo", v1.UploadApplyAndDicomInfo)
+		// 第三方PACS申请单和影像数据上传(时间段为：上传成功为开始时间，结束为参数时间)
+		apiv1.POST("/PACS/Upload/ApplyAndDicomInfoTime", v1.UploadApplyAndDicomInfoTime)
+
 	}
 	return r
 }
