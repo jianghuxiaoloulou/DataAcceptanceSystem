@@ -75,8 +75,8 @@ type RcqfbtApplyInfo struct {
 }
 
 type RcqfbtApplyData struct {
-	HospitalId            string         `json:"hospitalId"`            // 医院id
-	StudyInstanceUid      string         `json:"studyInstanceUid"`      // Dicom中study_instance_uid
+	HospitalId            string         `json:"hospitalId"`            // 医院id (必填)
+	StudyInstanceUid      string         `json:"studyInstanceUid"`      // Dicom中study_instance_uid （必填）
 	RegisterId            string         `json:"registerId"`            // 登记单id
 	PatientCode           string         `json:"patientCode"`           // 患者编号
 	HisPatientId          string         `json:"hisPatientId"`          // his患者唯一id
@@ -146,21 +146,21 @@ type RcqfbtApplyData struct {
 }
 
 type BodyPartStr struct {
-	BodyPartId      string           `json:"bodyPartId"`
-	BodyPartCode    string           `json:"bodyPartCode"`
-	BodyPartName    string           `json:"bodyPartName"`
-	HisBodyPartCode string           `json:"hisBodyPartCode"`
+	BodyPartId      string           `json:"bodyPartId"`      // 检查部位id
+	BodyPartCode    string           `json:"bodyPartCode"`    // 检查部位编码
+	BodyPartName    string           `json:"bodyPartName"`    // 检查部位名称
+	HisBodyPartCode string           `json:"hisBodyPartCode"` // his检查部位编码
 	ProjectList     []ProjectItemStr `json:"projectList"`
 }
 
 type ProjectItemStr struct {
-	RequestDetailId string  `json:"requestDetailId"`
-	ProjectId       string  `json:"projectId"`
-	ProjectCode     string  `json:"projectCode"`
-	ProjectName     string  `json:"projectName"`
-	HisProjectCode  string  `json:"hisProjectCode"`
-	Fee             float64 `json:"fee"`
-	ProjectNote     string  `json:"projectNote"`
+	RequestDetailId string  `json:"requestDetailId"` // his申请明细id
+	ProjectId       string  `json:"projectId"`       // 检查项目id
+	ProjectCode     string  `json:"projectCode"`     // 检查项目编码
+	ProjectName     string  `json:"projectName"`     // 检查项目名称
+	HisProjectCode  string  `json:"hisProjectCode"`  // his检查项目id
+	Fee             float64 `json:"fee"`             // 检查项目费用
+	ProjectNote     string  `json:"projectNote"`     // 检查项目注意事项
 }
 
 // 飞利浦PACS远程申请时请求的数据
