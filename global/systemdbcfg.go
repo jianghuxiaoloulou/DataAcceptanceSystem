@@ -49,7 +49,6 @@ type HospitalConfig struct {
 	DicomView        sql.NullString // DICOM视图名
 	ApplyView        sql.NullString // PACS提供的申请单视图名
 	PacsInterfaceURL sql.NullString // PACS回写接口URL
-	CenterHospitalID sql.NullString // 上级中心医院的医院ID
 	UploadTime       sql.NullString // PACS数据上传时记录的时间
 }
 
@@ -65,6 +64,7 @@ type ApplyFuncConfig struct {
 	ApplyAudited    sql.NullString // 申请单状态--已审核（多功能通过|*|分割）
 	ApplyCharging   sql.NullString // 申请单状态--主动计费（多功能通过|*|分割）
 	ApplyDiagnose   sql.NullString // 申请单状态--远程诊断（多功能通过|*|分割）
+	ApplyViewRemote sql.NullString // 申请单状态-- 远程查看
 }
 
 type DictConfig struct {

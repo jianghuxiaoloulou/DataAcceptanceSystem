@@ -6,9 +6,8 @@ import (
 	"database/sql"
 	"time"
 
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	// _ "github.com/mattn/go-adodb"
 	_ "github.com/denisenkom/go-mssqldb"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 // PACS集成平台数据库操作

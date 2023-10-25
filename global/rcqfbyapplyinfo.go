@@ -75,7 +75,8 @@ type RcqfbtApplyInfo struct {
 }
 
 type RcqfbtApplyData struct {
-	HospitalId            string         `json:"hospitalId"`            // 医院id (必填)
+	HospitalId            string         `json:"hospitalId"`            // 申请医院id (必填)
+	CenterHospitalId      string         `json:"centerHospitalId"`      // 中心医院id (必填)
 	StudyInstanceUid      string         `json:"studyInstanceUid"`      // Dicom中study_instance_uid （必填）
 	RegisterId            string         `json:"registerId"`            // 登记单id
 	PatientCode           string         `json:"patientCode"`           // 患者编号

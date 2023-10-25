@@ -78,6 +78,7 @@ go build -ldflags="-H windowsgui" -o .\DataAcceptanceSystem\DataAcceptanceSystem
 
 
 # 修改记录
+* 2023/10/24 修改数据，回写数据从区域PACS获取
 * 2023/09/25 增加一个接口，默认数据开始时间是上传成功时间，结束时间是参数时间
 * 2023/09/20 增加FTP下载文件和sql server 数据库
 * 2023/08/17 增加远程查看接口

@@ -26,20 +26,7 @@ func ApplyFormStatusNotity(data global.ApplyFormStatusData) {
 			applyCancel := strings.Split(applyFuncCfg.ApplyCanceled.String, "|*|")
 			global.Logger.Debug("需要实现的功能：", applyCancel)
 			for _, value := range applyCancel {
-				switch value {
-				case global.Apply_Func_A:
-					global.Logger.Debug("实现功能A")
-				case global.Apply_Func_B:
-					global.Logger.Debug("实现功能B")
-				case global.Apply_Func_C:
-					global.Logger.Debug("实现功能C")
-				case global.Apply_Func_D:
-					global.Logger.Debug("实现功能D")
-				case global.Apply_Func_E:
-					global.Logger.Debug("实现功能E")
-				default:
-					global.Logger.Debug("未实现该功能")
-				}
+				WorkListFunc(value, data.PARAM.ParamValue)
 			}
 		}
 	case global.Apply_Status_Registered:
@@ -50,20 +37,7 @@ func ApplyFormStatusNotity(data global.ApplyFormStatusData) {
 			applyRegis := strings.Split(applyFuncCfg.ApplyRegistered.String, "|*|")
 			global.Logger.Debug("需要实现的功能：", applyRegis)
 			for _, value := range applyRegis {
-				switch value {
-				case global.Apply_Func_A:
-					global.Logger.Debug("实现功能A")
-				case global.Apply_Func_B:
-					global.Logger.Debug("实现功能B")
-				case global.Apply_Func_C:
-					global.Logger.Debug("实现功能C")
-				case global.Apply_Func_D:
-					global.Logger.Debug("实现功能D")
-				case global.Apply_Func_E:
-					global.Logger.Debug("实现功能E")
-				default:
-					global.Logger.Debug("未实现该功能")
-				}
+				WorkListFunc(value, data.PARAM.ParamValue)
 			}
 		}
 	case global.Apply_Status_Checked:
@@ -74,20 +48,7 @@ func ApplyFormStatusNotity(data global.ApplyFormStatusData) {
 			applyCheck := strings.Split(applyFuncCfg.ApplyChecked.String, "|*|")
 			global.Logger.Debug("需要实现的功能：", applyCheck)
 			for _, value := range applyCheck {
-				switch value {
-				case global.Apply_Func_A:
-					global.Logger.Debug("实现功能A")
-				case global.Apply_Func_B:
-					global.Logger.Debug("实现功能B")
-				case global.Apply_Func_C:
-					global.Logger.Debug("实现功能C")
-				case global.Apply_Func_D:
-					global.Logger.Debug("实现功能D")
-				case global.Apply_Func_E:
-					global.Logger.Debug("实现功能E")
-				default:
-					global.Logger.Debug("未实现该功能")
-				}
+				WorkListFunc(value, data.PARAM.ParamValue)
 			}
 		}
 	case global.Apply_Status_Drafted:
@@ -98,20 +59,7 @@ func ApplyFormStatusNotity(data global.ApplyFormStatusData) {
 			applyDraft := strings.Split(applyFuncCfg.ApplyDrafted.String, "|*|")
 			global.Logger.Debug("需要实现的功能：", applyDraft)
 			for _, value := range applyDraft {
-				switch value {
-				case global.Apply_Func_A:
-					global.Logger.Debug("实现功能A")
-				case global.Apply_Func_B:
-					global.Logger.Debug("实现功能B")
-				case global.Apply_Func_C:
-					global.Logger.Debug("实现功能C")
-				case global.Apply_Func_D:
-					global.Logger.Debug("实现功能D")
-				case global.Apply_Func_E:
-					global.Logger.Debug("实现功能E")
-				default:
-					global.Logger.Debug("未实现该功能")
-				}
+				WorkListFunc(value, data.PARAM.ParamValue)
 			}
 		}
 	case global.Apply_Status_WaitAudit:
@@ -122,20 +70,7 @@ func ApplyFormStatusNotity(data global.ApplyFormStatusData) {
 			applyWaitAudit := strings.Split(applyFuncCfg.ApplyWaitaudit.String, "|*|")
 			global.Logger.Debug("需要实现的功能：", applyWaitAudit)
 			for _, value := range applyWaitAudit {
-				switch value {
-				case global.Apply_Func_A:
-					global.Logger.Debug("实现功能A")
-				case global.Apply_Func_B:
-					global.Logger.Debug("实现功能B")
-				case global.Apply_Func_C:
-					global.Logger.Debug("实现功能C")
-				case global.Apply_Func_D:
-					global.Logger.Debug("实现功能D")
-				case global.Apply_Func_E:
-					global.Logger.Debug("实现功能E")
-				default:
-					global.Logger.Debug("未实现该功能")
-				}
+				WorkListFunc(value, data.PARAM.ParamValue)
 			}
 		}
 	case global.Apply_Status_Audited:
@@ -146,20 +81,29 @@ func ApplyFormStatusNotity(data global.ApplyFormStatusData) {
 			applyAudit := strings.Split(applyFuncCfg.ApplyAudited.String, "|*|")
 			global.Logger.Debug("需要实现的功能：", applyAudit)
 			for _, value := range applyAudit {
-				switch value {
-				case global.Apply_Func_A:
-					global.Logger.Debug("实现功能A")
-				case global.Apply_Func_B:
-					global.Logger.Debug("实现功能B")
-				case global.Apply_Func_C:
-					global.Logger.Debug("实现功能C")
-				case global.Apply_Func_D:
-					global.Logger.Debug("实现功能D")
-				case global.Apply_Func_E:
-					global.Logger.Debug("实现功能E")
-				default:
-					global.Logger.Debug("未实现该功能")
-				}
+				WorkListFunc(value, data.PARAM.ParamValue)
+			}
+		}
+	case global.Apply_Status_Diagnose:
+		global.Logger.Debug(data.PARAM.ParamValue, " 申请单开始申请远程诊断")
+		if applyFuncCfg.ApplyDiagnose.String != "" {
+			global.Logger.Debug("开始处理申请单远程诊断功能....")
+			// 分割符|*|
+			applyDiag := strings.Split(applyFuncCfg.ApplyDiagnose.String, "|*|")
+			global.Logger.Debug("需要实现的功能：", applyDiag)
+			for _, value := range applyDiag {
+				WorkListFunc(value, data.PARAM.ParamValue)
+			}
+		}
+	case global.Apply_Status_ViewRemote:
+		global.Logger.Debug(data.PARAM.ParamValue, " 申请单开始申请远程查看")
+		if applyFuncCfg.ApplyViewRemote.String != "" {
+			global.Logger.Debug("开始处理申请单远程查看功能....")
+			// 分割符|*|
+			applyViewRemote := strings.Split(applyFuncCfg.ApplyDiagnose.String, "|*|")
+			global.Logger.Debug("需要实现的功能：", applyViewRemote)
+			for _, value := range applyViewRemote {
+				WorkListFunc(value, data.PARAM.ParamValue)
 			}
 		}
 	case global.Apply_Status_Charging:
@@ -170,29 +114,33 @@ func ApplyFormStatusNotity(data global.ApplyFormStatusData) {
 			applyCharg := strings.Split(applyFuncCfg.ApplyCharging.String, "|*|")
 			global.Logger.Debug("需要实现的功能：", applyCharg)
 			for _, value := range applyCharg {
-				switch value {
-				case global.Apply_Func_A:
-					global.Logger.Debug("实现功能A")
-				case global.Apply_Func_B:
-					global.Logger.Debug("实现功能B")
-				case global.Apply_Func_C:
-					global.Logger.Debug("实现功能C")
-				case global.Apply_Func_D:
-					global.Logger.Debug("实现功能D")
-				case global.Apply_Func_E:
-					global.Logger.Debug("实现功能E")
-				default:
-					global.Logger.Debug("未实现该功能")
-				}
+				WorkListFunc(value, data.PARAM.ParamValue)
 			}
 		}
-	case global.Apply_Status_Diagnose:
-		global.Logger.Debug(data.PARAM.ParamValue, " 申请单开始申请远程诊断")
-		rcqfby.SendRemoteDiagnoseApplyData(data.HospitalID, data.PARAM.ParamValue)
-	case global.Apply_Status_ViewRemote:
-		global.Logger.Debug(data.PARAM.ParamValue, " 申请单开始申请远程查看")
-		rcqfby.SendRemoteViewApplyData(data.HospitalID, data.PARAM.ParamValue)
 	default:
 		global.Logger.Debug(data.PARAM.ParamValue, " 申请单未知状态")
+	}
+}
+
+// 实现功能清单列表
+func WorkListFunc(key, value string) {
+	switch key {
+	case global.Apply_Func_A:
+		global.Logger.Debug("实现功能A")
+	case global.Apply_Func_B:
+		global.Logger.Debug("实现功能B")
+	case global.Apply_Func_C:
+		global.Logger.Debug("实现功能C")
+	case global.Apply_Func_D:
+		global.Logger.Debug("实现功能D: 任城区妇保院报告回写")
+		rcqfby.ReportDataWriteBack(value)
+	case global.Apply_Func_E:
+		global.Logger.Debug("实现功能E: 济宁附属医院远程诊断")
+		rcqfby.SendRemoteDiagnoseApplyData(value)
+	case global.Apply_Func_F:
+		global.Logger.Debug("实现功能F: 济宁附属医院远程查看")
+		rcqfby.SendRemoteViewApplyData(value)
+	default:
+		global.Logger.Debug("未实现该功能")
 	}
 }

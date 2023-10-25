@@ -20,8 +20,9 @@ const (
 	Apply_Func_A string = "A" // 中联HIS申请单取消报到回写
 	Apply_Func_B string = "B" // 中联HIS申请单取消报到回写
 	Apply_Func_C string = "C" // 中联HIS申请单取消报到回写
-	Apply_Func_D string = "D" // 中联HIS申请单取消报到回写
-	Apply_Func_E string = "E" // 申请远程诊断发送申请单到飞利浦PACS
+	Apply_Func_D string = "D" // 任城区妇保院报告回写
+	Apply_Func_E string = "E" // 济宁附属医院远程诊断
+	Apply_Func_F string = "F" // 济宁附属医院远程查看
 )
 
 // 申请单状态请求

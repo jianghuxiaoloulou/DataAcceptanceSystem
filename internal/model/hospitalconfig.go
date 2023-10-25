@@ -8,7 +8,7 @@ import "WowjoyProject/DataAcceptanceSystem/global"
 func GetHospitalConfig(hospitalID string) (global.HospitalConfig, error) {
 	global.Logger.Info("开始查询对接医院相关信息: ", hospitalID)
 	sql := `SELECT hospital_id,hospital_name,his_type,pacs_db_type,pacs_db_conn,dicom_view,apply_view,pacs_interface_url,
-	center_hospital_id,upload_time FROM sys_dict_hospital_config WHERE hospital_id = ?`
+	upload_time FROM sys_dict_hospital_config WHERE hospital_id = ?`
 	var err error
 	err = global.DBEngine.Ping()
 	if err != nil {
@@ -20,7 +20,7 @@ func GetHospitalConfig(hospitalID string) (global.HospitalConfig, error) {
 	row := global.DBEngine.QueryRow(sql, hospitalID)
 	hosdata := global.HospitalConfig{}
 	err = row.Scan(&hosdata.HospitalId, &hosdata.HospitalName, &hosdata.HISType, &hosdata.PacsDBType, &hosdata.PacsDBConn,
-		&hosdata.DicomView, &hosdata.ApplyView, &hosdata.PacsInterfaceURL, &hosdata.CenterHospitalID, &hosdata.UploadTime)
+		&hosdata.DicomView, &hosdata.ApplyView, &hosdata.PacsInterfaceURL, &hosdata.UploadTime)
 	if err != nil {
 		global.Logger.Error(err)
 		return hosdata, err

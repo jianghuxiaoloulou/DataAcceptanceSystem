@@ -343,8 +343,8 @@ func UploadReportData(data global.ReportInfo) {
 }
 
 // 通过存储过程回写数据到妇保院
-func WriteBackProc(data global.ReportInfo) {
-	global.Logger.Debug("开始执行济宁医学院报告数据通过存储过程上传到妇保院", data)
+func WriteBackProc(data global.RcqfbtApplyData) {
+	global.Logger.Debug("开始执行报告数据通过存储过程上传到妇保院", data)
 	// 1.通过HospitalID 获取医院相关数据库连接信息
 	hospitalConfig, err := model.GetHospitalConfig(data.HospitalId)
 	if err != nil {
@@ -359,12 +359,12 @@ func WriteBackProc(data global.ReportInfo) {
 		return
 	}
 	sql := "exec dbo.RCFY_CT_REPORT @Str_StudyInstanceUID = '" + data.StudyInstanceUid + "',"
-	sql += "@Str_results = '" + data.Conclusion + "',"
-	sql += "@Str_finding = '" + data.Finding + "',"
-	sql += "@Str_reportdoc = '" + data.ReportDoctorName + "',"
-	sql += "@Str_auditdoc = '" + data.AuditDoctorName + "',"
-	sql += "@Str_WriteDateTime = " + "'" + data.ReportTime + "',"
-	sql += "@str_ReferringDate = " + "'" + data.AuditTime + "',"
+	sql += "@Str_results = '" + data.ReportData.WYG + "',"
+	sql += "@Str_finding = '" + data.ReportData.WYS + "',"
+	sql += "@Str_reportdoc = '" + data.ReportData.Creater + "',"
+	sql += "@Str_auditdoc = '" + data.ReportData.Approver + "',"
+	sql += "@Str_WriteDateTime = " + "'" + data.ReportData.CreateDt + "',"
+	sql += "@str_ReferringDate = " + "'" + data.ReportData.ApproveDt + "',"
 	sql += "@Str_ReportStatus = " + "'3'"
 
 	global.Logger.Debug("执行存储过程的sql: ", sql)
@@ -376,21 +376,20 @@ func WriteBackProc(data global.ReportInfo) {
 	global.Logger.Debug("回写报告，调用存储过程完成")
 }
 
-// (函数功能E)申请远程诊断发送申请单到飞利浦PACS
-func SendRemoteDiagnoseApplyData(hospitalid, applyid string) {
+// (函数功能D)任城区妇保院报告回写
+func ReportDataWriteBack(applyid string) {
+	global.Logger.Debug("通过接口获取报告数据：", applyid)
+	objdata := GetQYPacsApplyReportData(applyid)
+	WriteBackProc(objdata.Data)
+}
+
+// (函数功能E)济宁附属医院远程诊断
+func SendRemoteDiagnoseApplyData(applyid string) {
 	global.Logger.Debug("通过接口获取远程诊断申请单信息：", applyid)
 	// 获取区域PACS申请单信息
 	objdata := GetQYPacsApplyData(applyid)
-	// 1.通过HospitalID 获取医院相关数据库连接信息
-	hospitalConfig, err := model.GetHospitalConfig(hospitalid)
-	if err != nil {
-		global.Logger.Error(err)
-		return
-	}
-	global.Logger.Debug("获取的医院相关连接信息：", hospitalConfig)
-
 	// 获取上传中心医院的接口信息
-	centerHospital, err := model.GetHospitalConfig(hospitalConfig.CenterHospitalID.String)
+	centerHospital, err := model.GetHospitalConfig(objdata.Data.CenterHospitalId)
 	if err != nil {
 		global.Logger.Error(err)
 		return
@@ -398,7 +397,7 @@ func SendRemoteDiagnoseApplyData(hospitalid, applyid string) {
 	global.Logger.Debug("中心医院信息：", centerHospital)
 
 	// 发送申请单数据到飞利浦PACS
-	global.Logger.Debug("发送申请单数据到飞利浦PACS: ", objdata)
+	global.Logger.Debug("发送申请单数据到济宁附属医院: ", objdata)
 	var FlpCheckItems []global.FLP_CheckItem
 	for _, body := range objdata.Data.BodyPartList {
 		for _, item := range body.ProjectList {
@@ -447,27 +446,18 @@ func SendRemoteDiagnoseApplyData(hospitalid, applyid string) {
 	SyncFLPPacsApplyData(obj, centerHospital.PacsInterfaceURL.String)
 }
 
-// (函数功能F)申请远程查看发送申请单和报告到飞利浦PACS
-func SendRemoteViewApplyData(hospitalid, applyid string) {
+// (函数功能F)济宁附属医院远程查看
+func SendRemoteViewApplyData(applyid string) {
 	global.Logger.Debug("通过接口获取远程查看申请单信息：", applyid)
 	// 获取区域PACS申请单信息和报告
 	objdata := GetQYPacsApplyReportData(applyid)
-	// 1.通过HospitalID 获取医院相关数据库连接信息
-	hospitalConfig, err := model.GetHospitalConfig(hospitalid)
-	if err != nil {
-		global.Logger.Error(err)
-		return
-	}
-	global.Logger.Debug("获取的医院相关连接信息：", hospitalConfig)
-
 	// 获取上传中心医院的接口信息
-	centerHospital, err := model.GetHospitalConfig(hospitalConfig.CenterHospitalID.String)
+	centerHospital, err := model.GetHospitalConfig(objdata.Data.CenterHospitalId)
 	if err != nil {
 		global.Logger.Error(err)
 		return
 	}
 	global.Logger.Debug("中心医院信息：", centerHospital)
-
 	// 发送申请单数据到飞利浦PACS
 	global.Logger.Debug("发送申请单数据到飞利浦PACS: ", objdata)
 	var FlpCheckItems []global.FLP_CheckItem
@@ -519,7 +509,7 @@ func SendRemoteViewApplyData(hospitalid, applyid string) {
 	SyncFLPPacsApplyData(obj, centerHospital.PacsInterfaceURL.String)
 }
 
-// 同步申请单到飞利浦PACS
+// 同步申请单到济宁附属医院飞利浦PACS
 func SyncFLPPacsApplyData(data global.FLPPACSApplyData, url string) {
 	global.Logger.Debug("开始执行同步申请单数据到飞利浦PACS", data)
 	reqdata, err := json.Marshal(data)
