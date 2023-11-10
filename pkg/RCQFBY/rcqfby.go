@@ -473,6 +473,20 @@ func SendRemoteViewApplyData(applyid string) {
 			FlpCheckItems = append(FlpCheckItems, flpitem)
 		}
 	}
+	reportData := global.FLP_ReportData{
+		ReportName: objdata.Data.ReportData.ReportName,
+		WYSRTF:     objdata.Data.ReportData.WYSRTF,
+		WYGRTF:     objdata.Data.ReportData.WYGRTF,
+		WYS:        objdata.Data.ReportData.WYS,
+		WYG:        objdata.Data.ReportData.WYG,
+		IsPositive: objdata.Data.ReportData.IsPositive,
+		Creater:    objdata.Data.ReportData.CreateDt,
+		CreateDt:   objdata.Data.ReportData.CreateDt,
+		Submitter:  objdata.Data.ReportData.Submitter,
+		SubmitDt:   objdata.Data.ReportData.SubmitDt,
+		Approver:   objdata.Data.ReportData.Approver,
+		ApproveDt:  objdata.Data.ReportData.ApproveDt,
+	}
 	obj := global.FLPPACSApplyData{
 		SiteName:         objdata.Data.HospitalId,
 		PatientID:        objdata.Data.PatientCode,
@@ -488,7 +502,7 @@ func SendRemoteViewApplyData(applyid string) {
 		AccNo:            objdata.Data.AccessionNumber,
 		ApplyDept:        objdata.Data.RequestDepartmentName,
 		ApplyDoctor:      objdata.Data.RequestDoctorName,
-		StudyInstanceUID: "",
+		StudyInstanceUID: objdata.Data.StudyInstanceUid,
 		CardNo:           objdata.Data.MedicareCardNumber,
 		InhospitalNo:     objdata.Data.ClinicNumber,
 		ClinicNo:         objdata.Data.ClinicNumber,
@@ -504,7 +518,7 @@ func SendRemoteViewApplyData(applyid string) {
 		ExamineDt:        objdata.Data.StudyTime,
 		Status:           2,
 		CheckItems:       FlpCheckItems,
-		ReportData:       objdata.Data.ReportData,
+		ReportData:       reportData,
 	}
 	SyncFLPPacsApplyData(obj, centerHospital.PacsInterfaceURL.String)
 }

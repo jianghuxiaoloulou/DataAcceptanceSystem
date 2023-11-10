@@ -187,6 +187,7 @@ func GetRcqfbyApplyData(db *sql.DB, sql, hospitalid string) (data []global.Rcqfb
 			QueueNumber:           key.QueueNumber.String,
 			DeviceId:              key.DeviceId.String,
 			DeviceCode:            key.DeviceCode.String,
+			DeviceName:            key.DeviceName.String,
 			TotalFee:              key.Fee.Float64,
 			StudyDoctorId:         key.StudyDoctorId.String,
 			StudyDoctorCode:       key.StudyDoctorCode.String,

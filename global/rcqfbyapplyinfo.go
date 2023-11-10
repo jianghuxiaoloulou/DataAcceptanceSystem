@@ -75,75 +75,75 @@ type RcqfbtApplyInfo struct {
 }
 
 type RcqfbtApplyData struct {
-	HospitalId            string         `json:"hospitalId"`            // 申请医院id (必填)
-	CenterHospitalId      string         `json:"centerHospitalId"`      // 中心医院id (必填)
-	StudyInstanceUid      string         `json:"studyInstanceUid"`      // Dicom中study_instance_uid （必填）
-	RegisterId            string         `json:"registerId"`            // 登记单id
-	PatientCode           string         `json:"patientCode"`           // 患者编号
-	HisPatientId          string         `json:"hisPatientId"`          // his患者唯一id
-	PatientName           string         `json:"patientName"`           // 患者名称
-	PatientSpellName      string         `json:"patientSpellName"`      // 患者拼音名
-	PatientSexCode        int            `json:"patientSexCode"`        // 患者性别编码
-	PatientSexName        string         `json:"patientSexName"`        // 患者性别名称
-	Age                   int            `json:"age"`                   // 年龄
-	AgeUnitCode           int            `json:"ageUnitCode"`           // 年龄单位编码
-	AgeUnitName           string         `json:"ageUnitName"`           // 年龄单位名称
-	Birthday              string         `json:"birthday"`              // 出生日期
-	IdCardNumber          string         `json:"idCardNumber"`          // 身份证号
-	MedicareCardNumber    string         `json:"medicareCardNumber"`    // 医保卡号
-	PhoneNumber           string         `json:"phoneNumber"`           // 手机号
-	Address               string         `json:"address"`               // 地址
-	ChiefComplaint        string         `json:"chiefComplaint"`        // 患者主诉
-	ClinicalManifestation string         `json:"clinicalManifestation"` // 临床表现
-	ClinicalDiagnosis     string         `json:"clinicalDiagnosis"`     // 临床诊断
-	MedicalHistory        string         `json:"medicalHistory"`        // 病史记录
-	CheckMemo             string         `json:"checkMemo"`             // 检查备注
-	RequestId             string         `json:"requestId"`             // his申请单记录ID
-	RequestNumber         string         `json:"requestNumber"`         // his申请单号id
-	RequestTime           string         `json:"requestTime"`           // 申请时间
-	MergencyStatus        int            `json:"mergencyStatus"`        // 急诊状态
-	ClinicNumber          string         `json:"clinicNumber"`          // 就诊号
-	MedicalRecordNumber   string         `json:"medicalRecordNumber"`   // 病历号
-	PatientTypeCode       int            `json:"patientTypeCode"`       // 患者类型编码
-	PatientTypeName       string         `json:"patientTypeName"`       // 患者类型名称
-	ModalityCode          int            `json:"modalityCode"`          // 检查类型编码
-	ModalityName          string         `json:"modalityName"`          // 检查类型名称
-	RequestDoctorCode     string         `json:"requestDoctorCode"`     // 申请医生编码
-	RequestDoctorName     string         `json:"requestDoctorName"`     // 申请医生名称
-	RequestDepartmentCode string         `json:"requestDepartmentCode"` // 申请科室编码
-	RequestDepartmentName string         `json:"requestDepartmentName"` // 申请科室名称
-	PatientSectionCode    string         `json:"patientSectionCode"`    // 病区编码
-	PatientSectionName    string         `json:"patientSectionName"`    // 病区名称
-	SickbedNumberCode     string         `json:"sickbedNumberCode"`     // 床位号编码
-	SickbedNumberName     string         `json:"sickbedNumberName"`     // 床位号名称
-	GraphicReport         int            `json:"graphicReport"`         // 图文报告
-	FilmType              int            `json:"filmType"`              // 胶片类型
-	FilmNum               int            `json:"filmNum"`               // 胶片数量
-	IsolationSign         string         `json:"isolationSign"`         // 隔离
-	IsGreenChannel        int            `json:"isGreenChannel"`        // 绿色通道
-	AccessionNumber       string         `json:"accessionNumber"`       // 检查号
-	RegisterStatus        int            `json:"registerStatus"`        // 申请单状态
-	RegisterDoctorId      string         `json:"registerDoctorId"`      // 登记医生id
-	RegisterDoctorCode    string         `json:"registerDoctorCode"`    // 登记医生编码
-	RegisterDoctorName    string         `json:"registerDoctorName"`    // 登记医生名称
-	RegisterTime          string         `json:"registerTime"`          // 登记时间
-	QueueNumber           string         `json:"queueNumber"`           // 排队号
-	DeviceId              string         `json:"deviceId"`              // 机房id
-	DeviceCode            string         `json:"deviceCode"`            // 机房编码
-	DeviceName            string         `json:"deviceName"`            // 机房名称
-	TotalFee              float64        `json:"totalFee"`              // 总费用
-	StudyDoctorId         string         `json:"studyDoctorId"`         // 检查医生id
-	StudyDoctorCode       string         `json:"studyDoctorCode"`       // 检查医生编码
-	StudyDoctorName       string         `json:"studyDoctorName"`       // 检查医生名称
-	StudyTime             string         `json:"studyTime"`             // 检查时间
-	AssistDoctorId        string         `json:"assistDoctorId"`        // 辅助医生id
-	AssistDoctorCode      string         `json:"assistDoctorCode"`      // 辅助医生编码
-	AssistDoctorName      string         `json:"assistDoctorName"`      // 辅助医生名称
-	OperationDoctorId     string         `json:"operationDoctorId"`     // 手术医生id
-	OperationDoctorCode   string         `json:"operationDoctorCode"`   // 手术医生编码
-	OperationDoctorName   string         `json:"operationDoctorName"`   // 手术医生名称
-	BodyPartList          []BodyPartStr  `json:"bodyPartList"`          // 检查部位
-	ReportData            FLP_ReportData `json:"Report"`                // 报告数据
+	HospitalId            string          `json:"hospitalId"`            // 申请医院id (必填)
+	CenterHospitalId      string          `json:"centerHospitalId"`      // 中心医院id (必填)
+	StudyInstanceUid      string          `json:"studyInstanceUid"`      // Dicom中study_instance_uid （必填）
+	RegisterId            string          `json:"registerId"`            // 登记单id
+	PatientCode           string          `json:"patientCode"`           // 患者编号
+	HisPatientId          string          `json:"hisPatientId"`          // his患者唯一id
+	PatientName           string          `json:"patientName"`           // 患者名称
+	PatientSpellName      string          `json:"patientSpellName"`      // 患者拼音名
+	PatientSexCode        int             `json:"patientSexCode"`        // 患者性别编码
+	PatientSexName        string          `json:"patientSexName"`        // 患者性别名称
+	Age                   int             `json:"age"`                   // 年龄
+	AgeUnitCode           int             `json:"ageUnitCode"`           // 年龄单位编码
+	AgeUnitName           string          `json:"ageUnitName"`           // 年龄单位名称
+	Birthday              string          `json:"birthday"`              // 出生日期
+	IdCardNumber          string          `json:"idCardNumber"`          // 身份证号
+	MedicareCardNumber    string          `json:"medicareCardNumber"`    // 医保卡号
+	PhoneNumber           string          `json:"phoneNumber"`           // 手机号
+	Address               string          `json:"address"`               // 地址
+	ChiefComplaint        string          `json:"chiefComplaint"`        // 患者主诉
+	ClinicalManifestation string          `json:"clinicalManifestation"` // 临床表现
+	ClinicalDiagnosis     string          `json:"clinicalDiagnosis"`     // 临床诊断
+	MedicalHistory        string          `json:"medicalHistory"`        // 病史记录
+	CheckMemo             string          `json:"checkMemo"`             // 检查备注
+	RequestId             string          `json:"requestId"`             // his申请单记录ID
+	RequestNumber         string          `json:"requestNumber"`         // his申请单号id
+	RequestTime           string          `json:"requestTime"`           // 申请时间
+	MergencyStatus        int             `json:"mergencyStatus"`        // 急诊状态
+	ClinicNumber          string          `json:"clinicNumber"`          // 就诊号
+	MedicalRecordNumber   string          `json:"medicalRecordNumber"`   // 病历号
+	PatientTypeCode       int             `json:"patientTypeCode"`       // 患者类型编码
+	PatientTypeName       string          `json:"patientTypeName"`       // 患者类型名称
+	ModalityCode          int             `json:"modalityCode"`          // 检查类型编码
+	ModalityName          string          `json:"modalityName"`          // 检查类型名称
+	RequestDoctorCode     string          `json:"requestDoctorCode"`     // 申请医生编码
+	RequestDoctorName     string          `json:"requestDoctorName"`     // 申请医生名称
+	RequestDepartmentCode string          `json:"requestDepartmentCode"` // 申请科室编码
+	RequestDepartmentName string          `json:"requestDepartmentName"` // 申请科室名称
+	PatientSectionCode    string          `json:"patientSectionCode"`    // 病区编码
+	PatientSectionName    string          `json:"patientSectionName"`    // 病区名称
+	SickbedNumberCode     string          `json:"sickbedNumberCode"`     // 床位号编码
+	SickbedNumberName     string          `json:"sickbedNumberName"`     // 床位号名称
+	GraphicReport         int             `json:"graphicReport"`         // 图文报告
+	FilmType              int             `json:"filmType"`              // 胶片类型
+	FilmNum               int             `json:"filmNum"`               // 胶片数量
+	IsolationSign         string          `json:"isolationSign"`         // 隔离
+	IsGreenChannel        int             `json:"isGreenChannel"`        // 绿色通道
+	AccessionNumber       string          `json:"accessionNumber"`       // 检查号
+	RegisterStatus        int             `json:"registerStatus"`        // 申请单状态
+	RegisterDoctorId      string          `json:"registerDoctorId"`      // 登记医生id
+	RegisterDoctorCode    string          `json:"registerDoctorCode"`    // 登记医生编码
+	RegisterDoctorName    string          `json:"registerDoctorName"`    // 登记医生名称
+	RegisterTime          string          `json:"registerTime"`          // 登记时间
+	QueueNumber           string          `json:"queueNumber"`           // 排队号
+	DeviceId              string          `json:"deviceId"`              // 机房id
+	DeviceCode            string          `json:"deviceCode"`            // 机房编码
+	DeviceName            string          `json:"deviceName"`            // 机房名称
+	TotalFee              float64         `json:"totalFee"`              // 总费用
+	StudyDoctorId         string          `json:"studyDoctorId"`         // 检查医生id
+	StudyDoctorCode       string          `json:"studyDoctorCode"`       // 检查医生编码
+	StudyDoctorName       string          `json:"studyDoctorName"`       // 检查医生名称
+	StudyTime             string          `json:"studyTime"`             // 检查时间
+	AssistDoctorId        string          `json:"assistDoctorId"`        // 辅助医生id
+	AssistDoctorCode      string          `json:"assistDoctorCode"`      // 辅助医生编码
+	AssistDoctorName      string          `json:"assistDoctorName"`      // 辅助医生名称
+	OperationDoctorId     string          `json:"operationDoctorId"`     // 手术医生id
+	OperationDoctorCode   string          `json:"operationDoctorCode"`   // 手术医生编码
+	OperationDoctorName   string          `json:"operationDoctorName"`   // 手术医生名称
+	BodyPartList          []BodyPartStr   `json:"bodyPartList"`          // 检查部位
+	ReportData            PACS_ReportData `json:"report"`                // 报告数据
 }
 
 type BodyPartStr struct {
@@ -205,6 +205,21 @@ type FLP_CheckItem struct {
 	ModalityType  string `json:"ModalityType"`  // 检查类型 Y
 	Modality      string `json:"Modality"`      // 检查设备 Y
 	RemoteRPID    string `json:"RemoteRPID"`    // 申请单号
+}
+
+type PACS_ReportData struct {
+	ReportName string `json:"reportName"` // 报告名称
+	WYSRTF     string `json:"wysrtf"`     // 检查所见RTF
+	WYGRTF     string `json:"wygrtg"`     // 诊断意见RTF
+	WYS        string `json:"wys"`        // 检查所见
+	WYG        string `json:"wyg"`        // 诊断意见
+	IsPositive string `json:"positive"`   // 1 阳；2 阴；3 未知
+	Creater    string `json:"creater"`    // 创建报告医生姓名
+	CreateDt   string `json:"createDt"`   // 创建时间（yyyy-MM-dd HH:mm:ss）
+	Submitter  string `json:"submitter"`  // 提交医生
+	SubmitDt   string `json:"submitDt"`   // 提交时间（yyyy-MM-dd HH:mm:ss）
+	Approver   string `json:"approver"`   // 审核医生
+	ApproveDt  string `json:"approveDt"`  // 审核时间（yyyy-MM-dd HH:mm:ss）
 }
 
 type FLP_ReportData struct {
