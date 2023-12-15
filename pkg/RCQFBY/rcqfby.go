@@ -358,7 +358,10 @@ func WriteBackProc(data global.RcqfbtApplyData) {
 		global.Logger.Error(err)
 		return
 	}
-	sql := "exec dbo.RCFY_CT_REPORT @Str_StudyInstanceUID = '" + data.StudyInstanceUid + "',"
+	if len(data.AccessionNumber) > 3 {
+		data.AccessionNumber = data.AccessionNumber[3:]
+	}
+	sql := "exec dbo.RCFY_CT_REPORT @Str_StudyInstanceUID = '" + data.AccessionNumber + "',"
 	sql += "@Str_results = '" + data.ReportData.WYG + "',"
 	sql += "@Str_finding = '" + data.ReportData.WYS + "',"
 	sql += "@Str_reportdoc = '" + data.ReportData.Creater + "',"
@@ -388,6 +391,13 @@ func SendRemoteDiagnoseApplyData(applyid string) {
 	global.Logger.Debug("通过接口获取远程诊断申请单信息：", applyid)
 	// 获取区域PACS申请单信息
 	objdata := GetQYPacsApplyData(applyid)
+	// 获取申请医院的接口信息
+	hospitalcfg, err := model.GetHospitalConfig(objdata.Data.HospitalId)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	global.Logger.Debug("申请医院信息：", hospitalcfg)
 	// 获取上传中心医院的接口信息
 	centerHospital, err := model.GetHospitalConfig(objdata.Data.CenterHospitalId)
 	if err != nil {
@@ -413,6 +423,7 @@ func SendRemoteDiagnoseApplyData(applyid string) {
 	}
 	obj := global.FLPPACSApplyData{
 		SiteName:         objdata.Data.HospitalId,
+		HospitalName:     hospitalcfg.HospitalName.String,
 		PatientID:        objdata.Data.PatientCode,
 		LocalName:        objdata.Data.PatientName,
 		EnglishName:      objdata.Data.PatientSpellName,
@@ -451,6 +462,14 @@ func SendRemoteViewApplyData(applyid string) {
 	global.Logger.Debug("通过接口获取远程查看申请单信息：", applyid)
 	// 获取区域PACS申请单信息和报告
 	objdata := GetQYPacsApplyReportData(applyid)
+	// 获取申请医院的接口信息
+	hospitalcfg, err := model.GetHospitalConfig(objdata.Data.HospitalId)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	global.Logger.Debug("申请医院信息：", hospitalcfg)
+
 	// 获取上传中心医院的接口信息
 	centerHospital, err := model.GetHospitalConfig(objdata.Data.CenterHospitalId)
 	if err != nil {
@@ -489,6 +508,7 @@ func SendRemoteViewApplyData(applyid string) {
 	}
 	obj := global.FLPPACSApplyData{
 		SiteName:         objdata.Data.HospitalId,
+		HospitalName:     hospitalcfg.HospitalName.String,
 		PatientID:        objdata.Data.PatientCode,
 		LocalName:        objdata.Data.PatientName,
 		EnglishName:      objdata.Data.PatientSpellName,

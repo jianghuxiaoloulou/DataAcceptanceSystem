@@ -71,16 +71,17 @@ type PatientInfo struct {
 type CheckBody struct {
 	Apply_bodypart_code string      `json:"apply_bodypart_code"` // 检查部位代码
 	Apply_bodypart_name string      `json:"apply_bodypart_name"` // 检查部位名字
-	Apply_checkItems    []CheckItem `json:"apply_checkitems"`    // 检查项目
+	Apply_bodypart_id   string      `json:"apply_bodypart_id"`
+	Apply_checkItems    []CheckItem `json:"apply_checkitems"` // 检查项目
 }
 
 // 检查项目
 type CheckItem struct {
-	Apply_check_item_code string `json:"apply_check_item_code" binding:"required"` // 检查项目代码
-	Apply_check_item_name string `json:"apply_check_item_name" binding:"required"` // 检查项目名字
-	Apply_detail_id       string `json:"apply_detail_id" binding:"required"`       // 申请明细序号
-	Apply_checkitem_fee   int    `json:"apply_checkitem_fee" binding:"required"`   // 检查项目费用
-	Apply_points_note     string `json:"apply_points_note"`                        // 注意事项
+	Apply_check_item_code string  `json:"apply_check_item_code" binding:"required"` // 检查项目代码
+	Apply_check_item_name string  `json:"apply_check_item_name" binding:"required"` // 检查项目名字
+	Apply_detail_id       string  `json:"apply_detail_id" binding:"required"`       // 申请明细序号
+	Apply_checkitem_fee   float64 `json:"apply_checkitem_fee" binding:"required"`   // 检查项目费用
+	Apply_points_note     string  `json:"apply_points_note"`                        // 注意事项
 }
 
 // 申请信息

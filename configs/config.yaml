@@ -20,7 +20,11 @@ Database:
   DBMaxLifetime: 60
   # ******PACS集成平台数据库连接信息******
   DBType: mysql
-  DBConn: espacs:Wowjoy@2018@tcp(172.16.255.26:30117)/ms_pacs_interface?charset=utf8
+  # 济宁区域PACS: espacs:2J3utZLph6@jnpacs@tcp(192.168.11.35:3306)/ms_pacs_interface?charset=utf8 
+  # 巴南区域PACS: espacs:tk648ND9BP@7jybn@tcp(10.33.27.19:3306)/ms_pacs_interface?charset=utf8
+  # 区域PACS开发环境：espacs:Wowjoy@2018@tcp(172.16.255.26:30117)/ms_pacs_interface?charset=utf8
+  DBConn: espacs:tk648ND9BP@7jybn@tcp(10.33.27.19:3306)/ms_pacs_interface?charset=utf8
+
 Object:
   # 第三方系统类型: 根据医院编号字典表对应（1.树兰医院，2.酉阳医院）
   InterfaceSystemType: 2

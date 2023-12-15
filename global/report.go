@@ -1,5 +1,7 @@
 package global
 
+import "database/sql"
+
 // 报告数据全局变量
 
 // 申请单状态请求
@@ -107,4 +109,44 @@ type CrisisInfoObj struct {
 	ProcessTime              string `json:"processTime"`              // 处理时间
 	WarnHisStatus            int    `json:"warnHisStatus"`            // 通知HIS状态 0-未通知 1-已通知
 	WarnPacsStatus           int    `json:"warnPacsStatus"`           // 通知pacs状态 0-未通知 1-已通知
+}
+
+// QYPACS登记检查相关信息
+type QYPACSRegisterInfo struct {
+	HospitalID         sql.NullString // 医院ID
+	RegisterId         sql.NullString // 申请单唯一ID(PACS中)
+	AccessionNumber    sql.NullString // 检查号
+	RegisterStatus     sql.NullInt16  // 申请单状态
+	RegisterDoctorId   sql.NullString // 登记医生id
+	RegisterDoctorCode sql.NullString // 登记医生Code
+	RegisterDoctorName sql.NullString // 登记医生名称
+	RegisterTime       sql.NullString // 登记时间
+	DeviceId           sql.NullString // 机房唯一id
+	DeviceCode         sql.NullString // 机房编码
+	DeviceName         sql.NullString // 机房名称
+	ApplyId            sql.NullString // 申请单编号（HIS中）
+	ApplydetailId      sql.NullString // his申请明细id（HIS中回写）
+	ProjectCode        sql.NullString // 检查项目编码
+	ProjectName        sql.NullString // 检查项目名称
+	StudyTime          sql.NullString // 检查时间
+	StudyDoctorId      sql.NullString // 检查医生id
+	StudyDoctorCode    sql.NullString // 检查医生编号
+	StudyDoctorName    sql.NullString // 检查医生名称
+	UpdateTime         sql.NullString // 登记记录最后更新时间
+}
+
+// QYPACS报告相关信息
+type QYPACSReportInfo struct {
+	HospitalID             sql.NullString // 医院ID
+	ReportTime             sql.NullString // 报告时间
+	ReportDoctorId         sql.NullString // 报告医生id
+	ReportDoctorCode       sql.NullString // 报告医生编号
+	ReportDoctorName       sql.NullString // 报告医生名称
+	AuditTime              sql.NullString // 审核时间
+	AuditDoctorId          sql.NullString // 审核医生id
+	AuditDoctorCode        sql.NullString // 审核医生编号
+	AuditDoctorName        sql.NullString // 审核医生名称
+	PositiveNegativeStatus sql.NullInt16  // 阴阳性状态，0-阴性，1-阳性
+	Finding                sql.NullString // 影像所见
+	Conclusion             sql.NullString // 诊断结论
 }

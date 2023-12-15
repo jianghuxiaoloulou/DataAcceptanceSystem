@@ -78,6 +78,7 @@ go build -ldflags="-H windowsgui" -o .\DataAcceptanceSystem\DataAcceptanceSystem
 
 
 # 修改记录
+* 2023/12/11 对接巴南区域PACS万达区域HIS对接
 * 2023/11/10 济宁区域PACS接口修改
 * 2023/10/24 修改数据，回写数据从区域PACS获取
 * 2023/09/25 增加一个接口，默认数据开始时间是上传成功时间，结束时间是参数时间

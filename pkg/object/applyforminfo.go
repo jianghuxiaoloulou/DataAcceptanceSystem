@@ -4,6 +4,7 @@ import (
 	"WowjoyProject/DataAcceptanceSystem/global"
 	"WowjoyProject/DataAcceptanceSystem/internal/model"
 	zlhis "WowjoyProject/DataAcceptanceSystem/pkg/ZLHIS"
+	"WowjoyProject/DataAcceptanceSystem/pkg/wdhis"
 )
 
 // 获取申请单数据
@@ -22,6 +23,9 @@ func GetApplyFormData(object global.ApplyFormInfoData) (count int, data []global
 		// 开始对接中联HIS厂商
 		global.Logger.Debug("开始对接中联HIS厂商")
 		count, data = zlhis.GetApplyData(hospitalConfig, object)
+	case global.HIS_Type_WDHIS:
+		global.Logger.Debug("开始对接万达区域HIS厂商")
+		count, data = wdhis.GetApplyData(hospitalConfig, object)
 	default:
 		// 未配置的数据库连接
 		global.Logger.Error("请配置sys_dict_hospital_config表中his_type字段的连接方式")

@@ -4,6 +4,7 @@ import (
 	"WowjoyProject/DataAcceptanceSystem/global"
 	"WowjoyProject/DataAcceptanceSystem/internal/model"
 	rcqfby "WowjoyProject/DataAcceptanceSystem/pkg/RCQFBY"
+	"WowjoyProject/DataAcceptanceSystem/pkg/wdhis"
 	"strings"
 )
 
@@ -126,11 +127,14 @@ func ApplyFormStatusNotity(data global.ApplyFormStatusData) {
 func WorkListFunc(key, value string) {
 	switch key {
 	case global.Apply_Func_A:
-		global.Logger.Debug("实现功能A")
+		global.Logger.Debug("实现功能A：万达区域HIS检查登记回写EX1001")
+		wdhis.FuncEX1001(value)
 	case global.Apply_Func_B:
-		global.Logger.Debug("实现功能B")
+		global.Logger.Debug("实现功能B：万达区域HIS检查回写(EX1002)")
+		wdhis.FuncEX1002(value)
 	case global.Apply_Func_C:
-		global.Logger.Debug("实现功能C")
+		global.Logger.Debug("实现功能C：万达区域HIS检查报告回写（EX1003）")
+		wdhis.FuncEX1003(value)
 	case global.Apply_Func_D:
 		global.Logger.Debug("实现功能D: 任城区妇保院报告回写")
 		rcqfby.ReportDataWriteBack(value)
@@ -140,6 +144,17 @@ func WorkListFunc(key, value string) {
 	case global.Apply_Func_F:
 		global.Logger.Debug("实现功能F: 济宁附属医院远程查看")
 		rcqfby.SendRemoteViewApplyData(value)
+	case global.Apply_Func_G:
+		global.Logger.Debug("实现功能G: 济宁附属医院远程审核")
+	case global.Apply_Func_H:
+		global.Logger.Debug("实现功能H: 万达区域HIS检查报告回写（EX1004）")
+		wdhis.FuncEX1004(value)
+	case global.Apply_Func_I:
+		global.Logger.Debug("实现功能I: 万达区域HIS申请单撤销（EX1006）")
+		wdhis.FuncEX1006(value)
+	case global.Apply_Func_J:
+		global.Logger.Debug("实现功能J: 万达区域HIS危急消息通知（EX2000）")
+		// wdhis.FuncEX2000(value)
 	default:
 		global.Logger.Debug("未实现该功能")
 	}

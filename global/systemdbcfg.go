@@ -15,6 +15,7 @@ var (
 // HIS厂商类型
 const (
 	HIS_Type_ZLHIS int = 10001 // 中联HIS
+	HIS_Type_WDHIS int = 10002 // 万达区域HIS
 )
 
 // HIS数据库类型
@@ -68,14 +69,19 @@ type ApplyFuncConfig struct {
 }
 
 type DictConfig struct {
-	DictType sql.NullInt16  // 字段类型
-	DictCode sql.NullInt16  // 字典Code
-	DictName sql.NullString // 字典Name
+	DictType    sql.NullInt16  // 字段类型
+	DictCode    sql.NullInt16  // 字典Code
+	DictName    sql.NullString // 字典Name
+	DictHisCode sql.NullString // HisCode
+	DictHisName sql.NullString // HisName
 }
 
 type DictDataObject struct {
-	Code int
-	Name string
+	Type    int
+	Code    int
+	Name    string
+	HisCode string
+	HisName string
 }
 
 // 系统配置
