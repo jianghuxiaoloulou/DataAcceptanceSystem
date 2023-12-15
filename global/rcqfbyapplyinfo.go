@@ -167,6 +167,7 @@ type ProjectItemStr struct {
 // 飞利浦PACS远程申请时请求的数据
 type FLPPACSApplyData struct {
 	SiteName         string          `json:"SiteName"`         // 区域站点名称（具体请求医院）Y
+	HospitalName     string          `json:"HospitalName"`     // 申请医院名字
 	PatientID        string          `json:"PatientID"`        // PACS 系统病人ID 号，PACS 中病人唯一标志 Y
 	LocalName        string          `json:"LocalName"`        // 病人姓名 Y
 	EnglishName      string          `json:"EnglishName"`      // 病人拼音 Y

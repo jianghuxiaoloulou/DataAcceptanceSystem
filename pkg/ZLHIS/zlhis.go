@@ -6,7 +6,7 @@ import (
 	"WowjoyProject/DataAcceptanceSystem/internal/model"
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -133,7 +133,7 @@ func RegisteredWriteBack(data global.ApplyFormStatusData) {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		global.Logger.Debug("ioutil.ReadAll err ", err.Error())
 		return
@@ -191,7 +191,7 @@ func CanceledWriteBack(data global.ApplyFormStatusData) {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		global.Logger.Debug("ioutil.ReadAll err ", err.Error())
 		return
@@ -264,7 +264,7 @@ func AuditedWriteBack(data global.ApplyFormStatusData) {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		global.Logger.Debug("ioutil.ReadAll err ", err.Error())
 		return

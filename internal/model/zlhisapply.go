@@ -93,13 +93,13 @@ func GetZLHisViewApply(db *sql.DB, sql string) (data []global.ApplyFormResultDat
 			itemname := checkItemsName[i]
 			var itemnote string
 			var itemdetailid string
-			var itemfee int
+			var itemfee float64
 			if i < len(checkItemsNote) {
 				itemnote = checkItemsNote[i]
 			}
 
 			if i < len(checkItemsfee) {
-				itemfee, _ = strconv.Atoi(checkItemsfee[i])
+				itemfee, _ = strconv.ParseFloat(checkItemsfee[i], 64)
 			}
 			if i < len(requestdetailid) {
 				itemdetailid = requestdetailid[i]

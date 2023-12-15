@@ -17,12 +17,16 @@ const (
 
 // 申请单功能模块
 const (
-	Apply_Func_A string = "A" // 中联HIS申请单取消报到回写
-	Apply_Func_B string = "B" // 中联HIS申请单取消报到回写
-	Apply_Func_C string = "C" // 中联HIS申请单取消报到回写
+	Apply_Func_A string = "A" // 万达区域HIS检查登记回写（EX1001）
+	Apply_Func_B string = "B" // 万达区域HIS检查回写（EX1002）
+	Apply_Func_C string = "C" // 万达区域HIS检查报告回写（EX1003）
 	Apply_Func_D string = "D" // 任城区妇保院报告回写
 	Apply_Func_E string = "E" // 济宁附属医院远程诊断
 	Apply_Func_F string = "F" // 济宁附属医院远程查看
+	Apply_Func_G string = "G" // 济宁附属医院远程审核
+	Apply_Func_H string = "H" // 万达区域HIS报告审核回写（EX1004）
+	Apply_Func_I string = "I" // 万达区域HIS申请单撤销（EX1006）
+	Apply_Func_J string = "J" // 万达区域HIS危急消息通知（EX2000）
 )
 
 // 申请单状态请求
