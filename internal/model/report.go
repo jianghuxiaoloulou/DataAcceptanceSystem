@@ -46,6 +46,7 @@ func GetHisPersonID(id, hospitalid string) (hisid string) {
 		global.Logger.Error(err)
 		return
 	}
+	global.Logger.Debug("查询到的hisCode: ", hisid)
 	return
 }
 
@@ -89,6 +90,7 @@ func GetQYPACSRegisterInfo(registerid string) (data []global.QYPACSRegisterInfo)
 		}
 		data = append(data, key)
 	}
+	global.Logger.Debug("获取到查询登记相关数据：", data)
 	return
 }
 
@@ -98,7 +100,7 @@ func GetQYPACSReportInfo(registerid string) (data global.QYPACSReportInfo) {
 	var err error
 	sql := `SELECT ri.hospital_id,ri.report_time,ri.report_doctor_id,ri.report_doctor_code,ri.report_doctor_name,
 	ri.audit_time,ri.audit_doctor_id,ri.audit_doctor_code,ri.audit_doctor_name,ri.positive_negative_status,
-	ri.finding,ri.conclusion 
+	ri.crisis_status,ri.finding,ri.conclusion 
 	FROM report_info ri 
 	WHERE ri.register_id = ?;`
 	// 获取临时QYPACS数据库引擎
@@ -111,10 +113,39 @@ func GetQYPACSReportInfo(registerid string) (data global.QYPACSReportInfo) {
 	row := QyPacsDB.QueryRow(sql, registerid)
 	err = row.Scan(&data.HospitalID, &data.ReportTime, &data.ReportDoctorId, &data.ReportDoctorCode, &data.ReportDoctorName,
 		&data.AuditTime, &data.AuditDoctorId, &data.AuditDoctorCode, &data.AuditDoctorName, &data.PositiveNegativeStatus,
-		&data.Finding, &data.Conclusion)
+		&data.CrisisStatus, &data.Finding, &data.Conclusion)
 	if err != nil {
 		global.Logger.Error(err)
 		return
 	}
+	global.Logger.Debug("获取到报告相关数据：", data)
+	return
+}
+
+// 获取危急值相关信息
+func GetQYPACSCrisisInfo(registerid string) (data global.QYPACSCrisisInfo) {
+	global.Logger.Info("获取危急值相关信息: ", registerid)
+	var err error
+	sql := `SELECT ri.hospital_id,ri.crisis_content,ri.request_doctor_code,ri.request_doctor_name,ri.request_doctor_phone_number,
+	ri.patient_phone_number,ri.process_content,ri.receiver_code,ri.receiver_name,ri.process_time,
+	ri.warn_his_status,ri.warn_pacs_status 
+	FROM report_crisis_info ri 
+	WHERE ri.register_id = ?;`
+	// 获取临时QYPACS数据库引擎
+	QyPacsDB, err := NewTempDBEngine(global.SystemData.QYPacsType, global.SystemData.QYPacsConn)
+	if err != nil {
+		global.Logger.Error("获取临时数据库引擎db err: ", err.Error())
+		return
+	}
+	defer QyPacsDB.Close()
+	row := QyPacsDB.QueryRow(sql, registerid)
+	err = row.Scan(&data.HospitalID, &data.CrisisContent, &data.RequestDoctorCode, &data.RequestDoctorName, &data.RequestDoctorPhoneNumber,
+		&data.PatientPhoneNumber, &data.ProcessContent, &data.ReceiverCode, &data.ReceiverName, &data.ProcessTime,
+		&data.WarnHisStatus, &data.WarnPacsStatus)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	global.Logger.Debug("获取到危急值相关数据：", data)
 	return
 }

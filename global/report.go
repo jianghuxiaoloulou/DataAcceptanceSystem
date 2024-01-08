@@ -147,6 +147,23 @@ type QYPACSReportInfo struct {
 	AuditDoctorCode        sql.NullString // 审核医生编号
 	AuditDoctorName        sql.NullString // 审核医生名称
 	PositiveNegativeStatus sql.NullInt16  // 阴阳性状态，0-阴性，1-阳性
+	CrisisStatus           sql.NullInt16  // 危急值状态，0-阴性，1-阳性
 	Finding                sql.NullString // 影像所见
 	Conclusion             sql.NullString // 诊断结论
+}
+
+// QYPACS危急值相关信息
+type QYPACSCrisisInfo struct {
+	HospitalID               sql.NullString // 医院ID
+	CrisisContent            sql.NullString // 危机值内容
+	RequestDoctorCode        sql.NullString // 申请医生代码
+	RequestDoctorName        sql.NullString // 申请医生名称
+	RequestDoctorPhoneNumber sql.NullString // 申请医生手机号
+	PatientPhoneNumber       sql.NullString // 患者手机号
+	ProcessContent           sql.NullString // 处理内容
+	ReceiverCode             sql.NullString // 获知人员代码
+	ReceiverName             sql.NullString // 获知人员名称
+	ProcessTime              sql.NullString // 处理时间
+	WarnHisStatus            sql.NullInt16  // 通知HIS状态 0-未通知 1-已通知
+	WarnPacsStatus           sql.NullInt16  // 通知pacs状态 0-未通知 1-已通知
 }

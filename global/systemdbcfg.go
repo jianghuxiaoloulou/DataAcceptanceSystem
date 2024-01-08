@@ -55,17 +55,18 @@ type HospitalConfig struct {
 
 // 医院申请单状态功能模块配置表
 type ApplyFuncConfig struct {
-	HospitalId      sql.NullString // 医院ID
-	HISType         sql.NullInt16  // HIS类型：对应HIS厂商类型
-	ApplyCanceled   sql.NullString // 申请单状态--已取消（多功能通过|*|分割）
-	ApplyRegistered sql.NullString // 申请单状态--已报到（多功能通过|*|分割）
-	ApplyChecked    sql.NullString // 申请单状态--已检查（多功能通过|*|分割）
-	ApplyDrafted    sql.NullString // 申请单状态--已起草（多功能通过|*|分割）
-	ApplyWaitaudit  sql.NullString // 申请单状态--待审核（多功能通过|*|分割）
-	ApplyAudited    sql.NullString // 申请单状态--已审核（多功能通过|*|分割）
-	ApplyCharging   sql.NullString // 申请单状态--主动计费（多功能通过|*|分割）
-	ApplyDiagnose   sql.NullString // 申请单状态--远程诊断（多功能通过|*|分割）
-	ApplyViewRemote sql.NullString // 申请单状态-- 远程查看
+	HospitalId        sql.NullString // 医院ID
+	HISType           sql.NullInt16  // HIS类型：对应HIS厂商类型
+	ApplyCanceled     sql.NullString // 申请单状态--已取消（多功能通过|*|分割）
+	ApplyRegistered   sql.NullString // 申请单状态--已报到（多功能通过|*|分割）
+	ApplyChecked      sql.NullString // 申请单状态--已检查（多功能通过|*|分割）
+	ApplyDrafted      sql.NullString // 申请单状态--已起草（多功能通过|*|分割）
+	ApplyWaitaudit    sql.NullString // 申请单状态--待审核（多功能通过|*|分割）
+	ApplyAudited      sql.NullString // 申请单状态--已审核（多功能通过|*|分割）
+	ApplyCharging     sql.NullString // 申请单状态--主动计费（多功能通过|*|分割）
+	ApplyDiagnose     sql.NullString // 申请单状态--远程诊断（多功能通过|*|分割）
+	ApplyViewRemote   sql.NullString // 申请单状态-- 远程查看（多功能通过|*|分割）
+	ApplyAuditeRemote sql.NullString // 申请单状态--远程审核（多功能通过|*|分割）
 }
 
 type DictConfig struct {

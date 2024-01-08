@@ -543,6 +543,92 @@ func SendRemoteViewApplyData(applyid string) {
 	SyncFLPPacsApplyData(obj, centerHospital.PacsInterfaceURL.String)
 }
 
+// (函数功能G)济宁附属医院远程审核
+func SendRemoteAuditeApplyData(applyid string) {
+	global.Logger.Debug("通过接口获取远程审核申请单信息：", applyid)
+	// 获取区域PACS申请单信息和报告
+	objdata := GetQYPacsApplyReportData(applyid)
+	// 获取申请医院的接口信息
+	hospitalcfg, err := model.GetHospitalConfig(objdata.Data.HospitalId)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	global.Logger.Debug("申请医院信息：", hospitalcfg)
+
+	// 获取上传中心医院的接口信息
+	centerHospital, err := model.GetHospitalConfig(objdata.Data.CenterHospitalId)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	global.Logger.Debug("中心医院信息：", centerHospital)
+	// 发送申请单数据到飞利浦PACS
+	global.Logger.Debug("发送申请单数据到飞利浦PACS: ", objdata)
+	var FlpCheckItems []global.FLP_CheckItem
+	for _, body := range objdata.Data.BodyPartList {
+		for _, item := range body.ProjectList {
+			flpitem := global.FLP_CheckItem{
+				ProcedureCode: item.ProjectCode,
+				CheckingItem:  item.ProjectName,
+				ModalityType:  objdata.Data.ModalityName,
+				Modality:      objdata.Data.DeviceName,
+				RemoteRPID:    objdata.Data.RegisterId,
+			}
+			FlpCheckItems = append(FlpCheckItems, flpitem)
+		}
+	}
+	reportData := global.FLP_ReportData{
+		ReportName: objdata.Data.ReportData.ReportName,
+		WYSRTF:     objdata.Data.ReportData.WYSRTF,
+		WYGRTF:     objdata.Data.ReportData.WYGRTF,
+		WYS:        objdata.Data.ReportData.WYS,
+		WYG:        objdata.Data.ReportData.WYG,
+		IsPositive: objdata.Data.ReportData.IsPositive,
+		Creater:    objdata.Data.ReportData.CreateDt,
+		CreateDt:   objdata.Data.ReportData.CreateDt,
+		Submitter:  objdata.Data.ReportData.Submitter,
+		SubmitDt:   objdata.Data.ReportData.SubmitDt,
+		Approver:   objdata.Data.ReportData.Approver,
+		ApproveDt:  objdata.Data.ReportData.ApproveDt,
+	}
+	obj := global.FLPPACSApplyData{
+		SiteName:         objdata.Data.HospitalId,
+		HospitalName:     hospitalcfg.HospitalName.String,
+		PatientID:        objdata.Data.PatientCode,
+		LocalName:        objdata.Data.PatientName,
+		EnglishName:      objdata.Data.PatientSpellName,
+		ReferenceNo:      objdata.Data.IdCardNumber,
+		Birthday:         objdata.Data.Birthday,
+		Gender:           objdata.Data.PatientSexName,
+		Address:          objdata.Data.Address,
+		Telephone:        objdata.Data.PhoneNumber,
+		RemotePID:        objdata.Data.RequestNumber,
+		Marriage:         "",
+		AccNo:            objdata.Data.AccessionNumber,
+		ApplyDept:        objdata.Data.RequestDepartmentName,
+		ApplyDoctor:      objdata.Data.RequestDoctorName,
+		StudyInstanceUID: objdata.Data.StudyInstanceUid,
+		CardNo:           objdata.Data.MedicareCardNumber,
+		InhospitalNo:     objdata.Data.ClinicNumber,
+		ClinicNo:         objdata.Data.ClinicNumber,
+		PatientType:      objdata.Data.PatientTypeName,
+		Observation:      objdata.Data.ClinicalDiagnosis,
+		HealthHistory:    objdata.Data.MedicalHistory,
+		IsEmergency:      objdata.Data.MergencyStatus,
+		BedNo:            objdata.Data.SickbedNumberName,
+		CurrentAge:       strconv.Itoa(objdata.Data.Age) + objdata.Data.AgeUnitName,
+		Registrar:        objdata.Data.RegisterDoctorCode,
+		RegisterDt:       objdata.Data.RegisterTime,
+		Technician:       objdata.Data.StudyDoctorCode,
+		ExamineDt:        objdata.Data.StudyTime,
+		Status:           3,
+		CheckItems:       FlpCheckItems,
+		ReportData:       reportData,
+	}
+	SyncFLPPacsApplyData(obj, centerHospital.PacsInterfaceURL.String)
+}
+
 // 同步申请单到济宁附属医院飞利浦PACS
 func SyncFLPPacsApplyData(data global.FLPPACSApplyData, url string) {
 	global.Logger.Debug("开始执行同步申请单数据到飞利浦PACS", data)

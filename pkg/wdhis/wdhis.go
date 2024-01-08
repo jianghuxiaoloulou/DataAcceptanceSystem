@@ -524,11 +524,15 @@ func HisApplyToPacsApply(hospitalid string, wdhisvalue []WDHISApplyInfo) (data [
 				}
 			}
 		}
+		fee := hisvalue.RequestFee.String()
+		if fee == "" {
+			fee = "0"
+		}
 		applyinfo := global.ApplyInfo{
 			Apply_hospital_id:        hospitalid,
 			Apply_id:                 hisvalue.RequestNo.String(),
 			Apply_time:               hisvalue.SubmitTime,
-			Apply_fee:                hisvalue.RequestFee.String(),
+			Apply_fee:                fee,
 			Apply_department_id:      hisvalue.ReqDeptCode,
 			Apply_department:         hisvalue.ReqDept,
 			Apply_doctor_id:          hisvalue.ReqDoctorId.String(),
@@ -784,7 +788,7 @@ func FuncEX1001(value string) {
 	if len(qydata) > 0 {
 		data = qydata[0]
 	}
-	if global.NullStringToString(data.ApplydetailId) == "" {
+	if data.ApplydetailId.String == "" {
 		global.Logger.Debug("申请单明细为空,不是HIS过来的数据,不需要回写HIS", data)
 		return
 	}
@@ -848,7 +852,7 @@ func FuncEX1002(value string) {
 	qydata := model.GetQYPACSRegisterInfo(value)
 	for _, data := range qydata {
 
-		if global.NullStringToString(data.ApplydetailId) == "" {
+		if data.ApplydetailId.String == "" {
 			global.Logger.Debug("申请单明细为空,不是HIS过来的数据,不需要回写HIS", data)
 			continue
 		}
@@ -930,27 +934,28 @@ func FuncEX1003(value string) {
 	// 1.获取HIS配置信息
 	hisconfig, _ := model.GetHisConfig(int(hospitalConfig.HISType.Int16))
 	// 获取HIS报告医生ID
-	reporthisid := model.GetHisPersonID(global.NullStringToString(qyreport.ReportDoctorId), global.NullStringToString(qyreport.HospitalID))
+	reporthisid := model.GetHisPersonID(qyreport.ReportDoctorId.String, qyreport.HospitalID.String)
 	for _, data := range qydata {
-		if global.NullStringToString(data.ApplydetailId) == "" {
+		global.Logger.Debug("获取的申请单数据：", data)
+		if data.ApplydetailId.String == "" {
 			global.Logger.Debug("申请单明细为空,不是HIS过来的数据,不需要回写HIS", data)
 			continue
 		}
 		// 获取HIS检查医生ID
-		examhisid := model.GetHisPersonID(global.NullStringToString(data.StudyDoctorId), global.NullStringToString(data.HospitalID))
+		examhisid := model.GetHisPersonID(data.StudyDoctorId.String, data.HospitalID.String)
 
 		ex1003 := EX1003Request{
-			RequestNo:     global.NullStringToString(data.ApplyId),
-			ItemSeq:       global.NullStringToString(data.ApplydetailId),
-			ExamNo:        global.NullStringToString(data.AccessionNumber),
+			RequestNo:     data.ApplyId.String,
+			ItemSeq:       data.ApplydetailId.String,
+			ExamNo:        data.AccessionNumber.String,
 			ExamEmpid:     examhisid,
-			ExamEmpanme:   global.NullStringToString(data.StudyDoctorName),
-			ExamTime:      global.NullStringToString(data.StudyTime),
+			ExamEmpanme:   data.StudyDoctorName.String,
+			ExamTime:      data.StudyTime.String,
 			ReportEmpid:   reporthisid,
-			ReportEmpname: global.NullStringToString(qyreport.ReportDoctorName),
-			ReportTime:    global.NullStringToString(qyreport.ReportTime),
-			Mani:          global.NullStringToString(qyreport.Finding),
-			Conclusion:    global.NullStringToString(qyreport.Conclusion),
+			ReportEmpname: qyreport.ReportDoctorName.String,
+			ReportTime:    qyreport.ReportTime.String,
+			Mani:          qyreport.Finding.String,
+			Conclusion:    qyreport.Conclusion.String,
 			AbnormalFlag:  abnormalflag,
 		}
 		reqdata := make(map[string]interface{})
@@ -1013,24 +1018,24 @@ func FuncEX1004(value string) {
 	// 1.获取HIS配置信息
 	hisconfig, _ := model.GetHisConfig(int(hospitalConfig.HISType.Int16))
 	// 获取HIS报告医生ID
-	reporthisid := model.GetHisPersonID(global.NullStringToString(qyreport.ReportDoctorId), global.NullStringToString(qyreport.HospitalID))
-	audithisid := model.GetHisPersonID(global.NullStringToString(qyreport.AuditDoctorId), global.NullStringToString(qyreport.HospitalID))
+	reporthisid := model.GetHisPersonID(qyreport.ReportDoctorId.String, qyreport.HospitalID.String)
+	audithisid := model.GetHisPersonID(qyreport.AuditDoctorId.String, qyreport.HospitalID.String)
 	for _, data := range qydata {
-		if global.NullStringToString(data.ApplydetailId) == "" {
+		if data.ApplydetailId.String == "" {
 			global.Logger.Debug("申请单明细为空,不是HIS过来的数据,不需要回写HIS", data)
 			return
 		}
 		ex1004 := EX1004Request{
-			RequestNo:     global.NullStringToString(data.ApplyId),
-			ItemSeq:       global.NullStringToString(data.ApplydetailId),
+			RequestNo:     data.ApplyId.String,
+			ItemSeq:       data.ApplydetailId.String,
 			AuditEmpid:    audithisid,
-			AuditEmpname:  global.NullStringToString(qyreport.AuditDoctorName),
-			AuditTime:     global.NullStringToString(qyreport.AuditTime),
+			AuditEmpname:  qyreport.AuditDoctorName.String,
+			AuditTime:     qyreport.AuditTime.String,
 			ReportEmpid:   reporthisid,
-			ReportEmpname: global.NullStringToString(qyreport.ReportDoctorName),
-			ReportTime:    global.NullStringToString(qyreport.ReportTime),
-			Mani:          global.NullStringToString(qyreport.Finding),
-			Conclusion:    global.NullStringToString(qyreport.Conclusion),
+			ReportEmpname: qyreport.ReportDoctorName.String,
+			ReportTime:    qyreport.ReportTime.String,
+			Mani:          qyreport.Finding.String,
+			Conclusion:    qyreport.Conclusion.String,
 			AbnormalFlag:  abnormalflag,
 		}
 		reqdata := make(map[string]interface{})
@@ -1053,7 +1058,7 @@ func FuncEX1004(value string) {
 		global.Logger.Debug("执行代码:ex1004,报告审核 ", string(requestData))
 
 		client := &http.Client{}
-		req, err := http.NewRequest("POST", global.NullStringToString(hisconfig.HISInterfaceURL), bytes.NewBuffer(requestData))
+		req, err := http.NewRequest("POST", hisconfig.HISInterfaceURL.String, bytes.NewBuffer(requestData))
 		if err != nil {
 			global.Logger.Error("http NewRequest err ", err.Error())
 			return
@@ -1124,7 +1129,7 @@ func FuncEX1101(ex1101 EX1101Request, url string) {
 func FuncEX1006(value string) {
 	qydata := model.GetQYPACSRegisterInfo(value)
 	for _, data := range qydata {
-		if global.NullStringToString(data.ApplydetailId) == "" {
+		if data.ApplydetailId.String == "" {
 			global.Logger.Debug("申请单明细为空,不是HIS过来的数据,不需要回写HIS", data)
 			continue
 		}
@@ -1134,13 +1139,13 @@ func FuncEX1006(value string) {
 		hisconfig, _ := model.GetHisConfig(int(hospitalConfig.HISType.Int16))
 
 		// 获取HIS登记医生ID
-		hisid := model.GetHisPersonID(data.StudyDoctorId.String, data.HospitalID.String)
+		hisid := model.GetHisPersonID(data.RegisterDoctorId.String, data.HospitalID.String)
 
 		// 获取回写his的申请单编号，登记人员，登记时间
 		ex1006 := EX1006Request{
 			RequestNo:   data.ApplyId.String,
 			RevokeEmpid: hisid,
-			RevokeTime:  global.NullStringToString(data.UpdateTime),
+			RevokeTime:  data.UpdateTime.String,
 			ItemSeq:     data.ApplydetailId.String,
 		}
 		reqdata := make(map[string]interface{})
@@ -1161,7 +1166,7 @@ func FuncEX1006(value string) {
 		global.Logger.Debug("执行代码:EX1006,申请单撤销 ", string(requestData))
 
 		client := &http.Client{}
-		req, err := http.NewRequest("POST", global.NullStringToString(hisconfig.HISInterfaceURL), bytes.NewBuffer(requestData))
+		req, err := http.NewRequest("POST", hisconfig.HISInterfaceURL.String, bytes.NewBuffer(requestData))
 		if err != nil {
 			global.Logger.Error("http NewRequest err ", err.Error())
 			return
@@ -1185,43 +1190,72 @@ func FuncEX1006(value string) {
 }
 
 // (函数功能J)危急情况通知（EX2000）
-func FuncEX2000(ex2000 EX2000Request, url string) {
-	reqdata := make(map[string]interface{})
-	reqdata["head"] = ReqHead{
-		UserId:   "LDPACS",
-		PassWord: "LD123",
-		TransNo:  "EX2000",
-	}
-	reqdata["request"] = ex2000
-	request := PostRequest{
-		Body: reqdata,
-	}
-	requestData, err := json.Marshal(request)
-	if err != nil {
-		global.Logger.Error("json Marshal err ", err.Error())
-		return
-	}
-	global.Logger.Debug("执行代码:EX2000,危急情况通知 ", string(requestData))
+func FuncEX2000(value string) {
+	qydata := model.GetQYPACSRegisterInfo(value)
+	qyreport := model.GetQYPACSReportInfo(value)
+	// 危急值
+	if qyreport.CrisisStatus.Valid && qyreport.CrisisStatus.Int16 == 1 {
+		global.Logger.Debug("危急值阳性，通知HIS")
+		qycrisis := model.GetQYPACSCrisisInfo(value)
+		// 1.通过HospitalID 获取医院相关数据库连接信息
+		hospitalConfig, _ := model.GetHospitalConfig(qyreport.HospitalID.String)
+		// 1.获取HIS配置信息
+		hisconfig, _ := model.GetHisConfig(int(hospitalConfig.HISType.Int16))
+		// 获取HIS登记医生ID
+		hisid := model.GetHisPersonID(qycrisis.RequestDoctorCode.String, qyreport.HospitalID.String)
 
-	client := &http.Client{}
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestData))
-	if err != nil {
-		global.Logger.Error("http NewRequest err ", err.Error())
-		return
-	}
-	req.Header.Add("Content-Type", "application/json;charset=utf-8")
+		for _, data := range qydata {
+			global.Logger.Debug("获取的申请单数据：", data)
+			ex2000 := EX2000Request{
+				MessageType:    "1",
+				RequestNo:      data.ApplyId.String,
+				MessageContent: qycrisis.CrisisContent.String,
+				OperTime:       qycrisis.ProcessTime.String,
+				OperId:         hisid,
+				OperName:       qycrisis.RequestDoctorName.String,
+				BranchCode:     hisconfig.HISTypeName.String,
+			}
+			reqdata := make(map[string]interface{})
+			reqdata["head"] = ReqHead{
+				UserId:   "LDPACS",
+				PassWord: "LD123",
+				TransNo:  "EX2000",
+			}
+			reqdata["request"] = ex2000
+			request := PostRequest{
+				Body: reqdata,
+			}
+			requestData, err := json.Marshal(request)
+			if err != nil {
+				global.Logger.Error("json Marshal err ", err.Error())
+				return
+			}
+			global.Logger.Debug("执行代码:EX2000,危急情况通知 ", string(requestData))
 
-	res, err := client.Do(req)
-	if err != nil {
-		global.Logger.Error("http Do err ", err.Error())
-		return
-	}
-	defer res.Body.Close()
+			client := &http.Client{}
+			req, err := http.NewRequest("POST", hisconfig.HISInterfaceURL.String, bytes.NewBuffer(requestData))
+			if err != nil {
+				global.Logger.Error("http NewRequest err ", err.Error())
+				return
+			}
+			req.Header.Add("Content-Type", "application/json;charset=utf-8")
 
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		global.Logger.Error("ioutil.ReadAll err ", err.Error())
+			res, err := client.Do(req)
+			if err != nil {
+				global.Logger.Error("http Do err ", err.Error())
+				return
+			}
+			defer res.Body.Close()
+
+			body, err := io.ReadAll(res.Body)
+			if err != nil {
+				global.Logger.Error("ioutil.ReadAll err ", err.Error())
+				return
+			}
+			global.Logger.Debug("EX2000：", string(body))
+		}
+	} else {
+		global.Logger.Debug("危急值阴性，终止通知HIS")
 		return
 	}
-	global.Logger.Debug("EX2000：", string(body))
 }

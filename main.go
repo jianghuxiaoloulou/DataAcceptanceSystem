@@ -6,9 +6,8 @@ import (
 	"WowjoyProject/DataAcceptanceSystem/internal/routers"
 	rcqfby "WowjoyProject/DataAcceptanceSystem/pkg/RCQFBY"
 	"WowjoyProject/DataAcceptanceSystem/pkg/workpattern"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 // @title PACS集成平台

@@ -118,6 +118,17 @@ func ApplyFormStatusNotity(data global.ApplyFormStatusData) {
 				WorkListFunc(value, data.PARAM.ParamValue)
 			}
 		}
+	case global.Apply_Status_AuditeRemote:
+		global.Logger.Debug(data.PARAM.ParamValue, " 申请单申请远程审核")
+		if applyFuncCfg.ApplyAuditeRemote.String != "" {
+			global.Logger.Debug("开始处理申请单申请远程审核的功能")
+			// 分隔符|*|
+			applyCharg := strings.Split(applyFuncCfg.ApplyCharging.String, "|*|")
+			global.Logger.Debug("需要实现的功能：", applyCharg)
+			for _, value := range applyCharg {
+				WorkListFunc(value, data.PARAM.ParamValue)
+			}
+		}
 	default:
 		global.Logger.Debug(data.PARAM.ParamValue, " 申请单未知状态")
 	}
@@ -146,6 +157,7 @@ func WorkListFunc(key, value string) {
 		rcqfby.SendRemoteViewApplyData(value)
 	case global.Apply_Func_G:
 		global.Logger.Debug("实现功能G: 济宁附属医院远程审核")
+		rcqfby.SendRemoteAuditeApplyData(value)
 	case global.Apply_Func_H:
 		global.Logger.Debug("实现功能H: 万达区域HIS检查报告回写（EX1004）")
 		wdhis.FuncEX1004(value)
