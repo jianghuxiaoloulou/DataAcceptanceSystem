@@ -195,7 +195,7 @@ type FLPPACSApplyData struct {
 	RegisterDt       string          `json:"RegisterDt"`       // 登记时间 Y
 	Technician       string          `json:"Technician"`       // 检查技师工号 Y
 	ExamineDt        string          `json:"ExamineDt"`        // 检查时间 Y
-	Status           int             `json:"Status"`           // 1-- 检查完成，2-- 报告审核
+	Status           int             `json:"Status"`           // 1-- 检查完成，2-- 报告审核,
 	CheckItems       []FLP_CheckItem `json:"Items"`            // 检查项目数据
 	ReportData       FLP_ReportData  `json:"Report"`           // 报告数据
 }
@@ -243,4 +243,10 @@ type QYPacsApplyData struct {
 	Code    string          `json:"code"`
 	Message string          `json:"message"`
 	Data    RcqfbtApplyData `json:"data"`
+}
+
+// 回写状态
+type WriteBackStatus struct {
+	RegisterID string `json:"registerId"` // 登记唯一ID
+	Status     int    `json:"status"`     // 1- 成功，0- 失败
 }

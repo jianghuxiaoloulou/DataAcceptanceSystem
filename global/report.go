@@ -167,3 +167,20 @@ type QYPACSCrisisInfo struct {
 	WarnHisStatus            sql.NullInt16  // 通知HIS状态 0-未通知 1-已通知
 	WarnPacsStatus           sql.NullInt16  // 通知pacs状态 0-未通知 1-已通知
 }
+
+// QYPACS检查项目信息
+type QYPACSProjectInfo struct {
+	ProjectID   sql.NullString // 检查项目唯一id
+	ProjectCode sql.NullString // 检查项目代码
+	ProjectName sql.NullString // 检查项目名称
+}
+
+// 医院映射项目信息
+type HospitalItemInfo struct {
+	HospitalProjectId    sql.NullString // 对应医院检查项目唯一id
+	HospitalId           sql.NullString // 所属医院
+	HospitalProjectCode  sql.NullString // 检查项目代码
+	HospitalProjectName  sql.NullString // 检查项目名称
+	HospitalModalityCode sql.NullInt16  // 检查类型
+	SystemProjectId      sql.NullString // 映射的项目id
+}

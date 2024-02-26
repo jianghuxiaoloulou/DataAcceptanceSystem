@@ -32,7 +32,7 @@ func GetRcqfbyApplyData(db *sql.DB, sql, hospitalid string) (data []global.Rcqfb
 			&key.Emergency, &key.IsolationFlag, &key.GreenchanFlag, &key.Fee, &key.RmethodName, &key.AccessionNumber,
 			&key.PatientCode, &key.HisPatientId, &key.RegisterStatus, &key.RegisterDoctorId, &key.RegisterDoctorCode,
 			&key.RegisterDoctorName, &key.RegisterTime, &key.QueueNumber, &key.DeviceId, &key.DeviceCode, &key.DeviceName,
-			&key.StudyDoctorId, &key.StudyDoctorCode, &key.StudyDoctorName, &key.AssistDoctorId, &key.AssistDoctorCode,
+			&key.StudyDoctorId, &key.StudyDoctorCode, &key.StudyDoctorName, &key.StudyTime, &key.AssistDoctorId, &key.AssistDoctorCode,
 			&key.AssistDoctorName, &key.OperationDoctorId, &key.OperationDoctorCode, &key.OperationDoctorName)
 		if err != nil {
 			global.Logger.Error("Scan err: ", err.Error())
@@ -89,8 +89,11 @@ func GetRcqfbyApplyData(db *sql.DB, sql, hospitalid string) (data []global.Rcqfb
 			var itemsarr []global.ProjectItemStr
 			bodycode := checkBodysCode[i]
 			bodyname := checkBodysName[i]
-			itemcode := checkItemsCode[i]
-			itemname := checkItemsName[i]
+			// 通过医院检查项目获取区域PACS的检查项目 (上传的时候，需要把下级医院的检查项目映射为QYPACS中的检查项目)
+			qypacsproject := GetQYPacsItemInfo(hospitalid, checkItemsCode[i], checkItemsName[i])
+			itemcode := qypacsproject.ProjectCode.String
+			itemname := qypacsproject.ProjectName.String
+			itemid := qypacsproject.ProjectID.String
 			var itemnote string
 			var itemdetailid string
 			var itemfee int
@@ -109,6 +112,7 @@ func GetRcqfbyApplyData(db *sql.DB, sql, hospitalid string) (data []global.Rcqfb
 				// 存在
 				item.ProjectCode = itemcode
 				item.ProjectName = itemname
+				item.ProjectId = itemid
 				item.ProjectNote = itemnote
 				item.RequestDetailId = itemdetailid
 				item.Fee = float64(itemfee)
@@ -121,6 +125,7 @@ func GetRcqfbyApplyData(db *sql.DB, sql, hospitalid string) (data []global.Rcqfb
 			} else {
 				// 不存在
 				bodymap[bodycode] = true
+				item.ProjectId = itemid
 				item.ProjectCode = itemcode
 				item.ProjectName = itemname
 				item.ProjectNote = itemnote
@@ -192,6 +197,7 @@ func GetRcqfbyApplyData(db *sql.DB, sql, hospitalid string) (data []global.Rcqfb
 			StudyDoctorId:         key.StudyDoctorId.String,
 			StudyDoctorCode:       key.StudyDoctorCode.String,
 			StudyDoctorName:       key.StudyDoctorName.String,
+			StudyTime:             key.StudyTime.String,
 			AssistDoctorId:        key.AssistDoctorId.String,
 			AssistDoctorCode:      key.AssistDoctorCode.String,
 			AssistDoctorName:      key.AssistDoctorName.String,

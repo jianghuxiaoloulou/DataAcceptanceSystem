@@ -149,3 +149,48 @@ func GetQYPACSCrisisInfo(registerid string) (data global.QYPACSCrisisInfo) {
 	global.Logger.Debug("获取到危急值相关数据：", data)
 	return
 }
+
+// 根据区域PACS项目ID 获取医院项目映射信息
+func GetHospitialItemInfo(hospitalid, systemItemId string) (data global.HospitalItemInfo) {
+	global.Logger.Info("获取医院检查项目相关信息")
+	var err error
+	sql := `SELECT spm.telemedicine_project_id,spm.telemedicine_project_code,spm.telemedicine_project_name,spm.modality_code 
+	from sys_telemedicine_project_mapping spm 
+	WHERE spm.hospital_id = ? AND spm.sys_project_id = ?;`
+	// 获取临时QYPACS数据库引擎
+	QyPacsDB, err := NewTempDBEngine(global.SystemData.QYPacsType, global.SystemData.QYPacsConn)
+	if err != nil {
+		global.Logger.Error("获取临时数据库引擎db err: ", err.Error())
+		return
+	}
+	defer QyPacsDB.Close()
+	row := QyPacsDB.QueryRow(sql, hospitalid, systemItemId)
+	err = row.Scan(&data.HospitalProjectId, &data.HospitalProjectCode, &data.HospitalProjectName, &data.HospitalModalityCode)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	global.Logger.Debug("获取医院检查项目相关信息: ", data)
+	return
+}
+
+// 获取区域PACS的检查项目信息
+func GetQYPacsItemInfo(hospitalid, itemcode, itemname string) (data global.QYPACSProjectInfo) {
+	sql := `SELECT sp.project_id,sp.project_code,sp.project_name FROM sys_telemedicine_project_mapping spm 
+	LEFT JOIN sys_project sp ON sp.project_id = spm.sys_project_id
+	WHERE spm.hospital_id = ? AND spm.telemedicine_project_code = ? AND spm.telemedicine_project_name = ?;`
+	QyPacsDB, err := NewTempDBEngine(global.SystemData.QYPacsType, global.SystemData.QYPacsConn)
+	if err != nil {
+		global.Logger.Error("获取临时数据库引擎db err: ", err.Error())
+		return
+	}
+	defer QyPacsDB.Close()
+	row := QyPacsDB.QueryRow(sql, hospitalid, itemcode, itemname)
+	err = row.Scan(&data.ProjectID, &data.ProjectCode, &data.ProjectName)
+	if err != nil {
+		global.Logger.Error(err)
+		return
+	}
+	global.Logger.Debug("检查项目信息：", data)
+	return
+}

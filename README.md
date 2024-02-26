@@ -78,6 +78,7 @@ go build -ldflags="-H windowsgui" -o .\DataAcceptanceSystem\DataAcceptanceSystem
 
 
 # 修改记录
+* 2024/01/08 创建V1.1.0 增加项目映射功能
 * 2023/12/11 对接巴南区域PACS万达区域HIS对接
 * 2023/11/10 济宁区域PACS接口修改
 * 2023/10/24 修改数据，回写数据从区域PACS获取
