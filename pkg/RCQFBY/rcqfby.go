@@ -67,9 +67,9 @@ func GetApplyData(hospital global.HospitalConfig, object global.ApplyDicomData) 
 	global.Logger.Debug("获取的申请单数据：", data)
 	for _, value := range data {
 		// 上传申请单数据
-		go UploadApplyData(PacsDB, hospital.HospitalId.String, value)
+		go UploadApplyData(PacsDB, hospital, value)
 		// 获取DICOM数据
-		go GetDicomData(PacsDB, hospital, value.AccessionNumber)
+		// go GetDicomData(PacsDB, hospital, value.AccessionNumber)
 	}
 }
 
@@ -120,14 +120,14 @@ func GetApplyDataTime(hospital global.HospitalConfig, object global.ApplyDicomDa
 	global.Logger.Debug("获取的申请单数据：", data)
 	for _, value := range data {
 		// 上传申请单数据
-		go UploadApplyData(PacsDB, hospital.HospitalId.String, value)
+		go UploadApplyData(PacsDB, hospital, value)
 		// 获取DICOM数据
-		go GetDicomData(PacsDB, hospital, value.AccessionNumber)
+		// go GetDicomData(PacsDB, hospital, value.AccessionNumber)
 	}
 }
 
 // 上传申请单数据
-func UploadApplyData(db *sql.DB, hospitalid string, data global.RcqfbtApplyData) {
+func UploadApplyData(db *sql.DB, hospital global.HospitalConfig, data global.RcqfbtApplyData) {
 	global.Logger.Debug("开始执行任城区妇保院申请单数据上传", data)
 	reqdata, err := json.Marshal(data)
 	global.Logger.Debug("上传申请单发送数据：", string(reqdata))
@@ -163,7 +163,10 @@ func UploadApplyData(db *sql.DB, hospitalid string, data global.RcqfbtApplyData)
 		if resultcode == "0" {
 			global.Logger.Info("任城区妇保院申请单数据上传成功：", data.AccessionNumber)
 			// 数据上传成功后，更新sys_dict_hospital_config表中upload_time时间
-			model.UpdateUploadTiem(data.RequestTime, hospitalid)
+			model.UpdateUploadTiem(data.RequestTime, hospital.HospitalId.String)
+			// 获取DICOM数据
+			go GetDicomData(db, hospital, data.AccessionNumber)
+
 		} else {
 			global.Logger.Error("任城区妇保院申请单数据上传失败：", data.AccessionNumber)
 		}
